@@ -15,3 +15,11 @@ is_older(d1,d6) = true;
 is_older(d1,d7) = false;
 is_older(d1,d8) = false;
 is_older(d1,d1) = false;
+
+val ld = [d1, d2, d3, d4, d5, d6, d7, d8];
+number_in_month(ld, 1) = 1;
+number_in_month(ld, 2) = 0;
+number_in_month(ld, 7) = 4;
+number_in_month(ld, 6) = 1;
+number_in_month(ld, 8) = 1;
+number_in_month(ld, ~7) = 1;
