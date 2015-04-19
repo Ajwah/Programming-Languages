@@ -19,4 +19,12 @@ fun number_in_months(ld: (int*int*int) list, lm: int list) =
   then 0
   else number_in_month(ld, hd lm) + number_in_months(ld, tl lm)
 
-						    
+fun dates_in_month(ld: (int*int*int) list, m: int) =
+  if null ld
+  then []
+  else let val md = (hd ld)
+       in if #2 md = m
+	  then md::dates_in_month(tl ld, m)
+	  else dates_in_month(tl ld, m)
+       end
+	   

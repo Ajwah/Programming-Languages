@@ -38,3 +38,11 @@ number_in_months(ld, lm4) = 0;
 number_in_months(ld, lm5) = 4;
 number_in_months(ld, lm6) = 4;
 number_in_months([], lm2) = 0;
+
+dates_in_month(ld, 1) = [(1982,1,1)];
+dates_in_month(ld, 2) = [];
+dates_in_month(ld, 7) = [d1, d5, d6, d8];
+dates_in_month(ld, 6) = [d3];
+dates_in_month(ld, 8) = [d4];
+dates_in_month(ld, ~7) = [d7];
+dates_in_month([], 7) = [];
