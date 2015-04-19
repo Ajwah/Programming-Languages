@@ -7,6 +7,11 @@ fun is_older(d1: int*int*int, d2: int*int*int) =
   then true
   else false
 
+fun is_older2(d1: int*int*int, d2: int*int*int) =
+  if (#2 d1) < (#2 d2)
+  then true
+  else false
+	   
 fun number_in_month(ld: (int*int*int) list, m: int) =
   if null ld
   then 0
@@ -69,3 +74,26 @@ fun month_range(day1: int, day2: int) =
        in range(what_month(day1), what_month(day2))
        end
 	   
+fun oldest(l: (int*int*int) list) =
+  if null l
+  then NONE
+  else let val max = oldest(tl l)
+       in if max = NONE
+	  then SOME (hd l)
+	  else if is_older(hd l, valOf max)
+	  then SOME (hd l)
+	  else max
+       end
+
+fun oldest_test(l: int list) =
+  if null l
+  then NONE
+  else let val max = oldest_test(tl l)
+       in if max = NONE
+	  then SOME (hd l)
+	  else if hd l < valOf max
+	  then SOME (hd l)
+	  else max
+       end;
+
+use "johnson_hw1_test.sml";
