@@ -45,4 +45,13 @@ fun date_to_string(d: int*int*int) =
       val day = " " ^ Int.toString(#3 d) ^ ", "
   in get_nth(months, month) ^ day ^ year
   end
-      
+
+fun number_before_reaching_sum(sum: int, l: int list) =
+  let fun summation(s: int, c: int, l: int list) =
+	if s >= sum
+	then c
+	else summation(s + hd l, c + 1, tl l)
+  in summation(0, ~1, l)
+  end
+
+     

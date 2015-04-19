@@ -101,3 +101,10 @@ date_to_string(d3);
 date_to_string(d4);
 date_to_string(d5);
 date_to_string(d6);
+
+number_before_reaching_sum(10, [1,2,3,4,5,6,7,8,9,10]) = 3;
+number_before_reaching_sum(15, [1,2,3,4,5,6,7,8,9,10]) = 4;
+number_before_reaching_sum(14, [1,2,3,4,5,6,7,8,9,10]) = 4;
+number_before_reaching_sum(16, [1,2,3,4,5,6,7,8,9,10]) = 5;
+number_before_reaching_sum(20, [1,2,3,4,5,6,7,8,9,10]) = 5;
+number_before_reaching_sum(50, [1,2,3,4,5,6,7,8,9,10]) = 9;
