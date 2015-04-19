@@ -54,4 +54,8 @@ fun number_before_reaching_sum(sum: int, l: int list) =
   in summation(0, ~1, l)
   end
 
-     
+fun what_month(d: int) =
+  let val months = [31,28,31,30,31,30,31,31,30,31,30,31]
+  in number_before_reaching_sum(d, months) + 1
+  end
+

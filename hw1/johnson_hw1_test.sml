@@ -95,12 +95,12 @@ get_nth(list_strings, 10) = "mMKzXyaQQcZEcj";
 get_nth(list_strings, 15) = "5oFjFZe0cvMqFv";
 get_nth(list_strings, 3) = "Vori9qgRabWRBj";
 
-date_to_string(d1);
-date_to_string(d2);
-date_to_string(d3);
-date_to_string(d4);
-date_to_string(d5);
-date_to_string(d6);
+date_to_string(d1) = "July 5, 1981";
+date_to_string(d2) = "January 1, 1982";
+date_to_string(d3) = "June 15, 1981";
+date_to_string(d4) = "August 1, 1981";
+date_to_string(d5) = "July 1, 1981";
+date_to_string(d6) = "July 15, 1981";
 
 number_before_reaching_sum(10, [1,2,3,4,5,6,7,8,9,10]) = 3;
 number_before_reaching_sum(15, [1,2,3,4,5,6,7,8,9,10]) = 4;
@@ -108,3 +108,16 @@ number_before_reaching_sum(14, [1,2,3,4,5,6,7,8,9,10]) = 4;
 number_before_reaching_sum(16, [1,2,3,4,5,6,7,8,9,10]) = 5;
 number_before_reaching_sum(20, [1,2,3,4,5,6,7,8,9,10]) = 5;
 number_before_reaching_sum(50, [1,2,3,4,5,6,7,8,9,10]) = 9;
+
+what_month(1) = 1;
+what_month(32) = 2;
+what_month(60) = 3;
+what_month(91) = 4;
+what_month(121) = 5;
+what_month(152) = 6;
+what_month(182) = 7;
+what_month(213) = 8;
+what_month(244) = 9;
+what_month(274) = 10;
+what_month(305) = 11;
+what_month(335) = 12;
