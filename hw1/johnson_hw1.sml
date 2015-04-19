@@ -27,4 +27,9 @@ fun dates_in_month(ld: (int*int*int) list, m: int) =
 	  then md::dates_in_month(tl ld, m)
 	  else dates_in_month(tl ld, m)
        end
-	   
+
+fun dates_in_months(ld: (int*int*int) list, lm: int list) =
+  if null lm
+  then []
+  else dates_in_month(ld, hd lm) @ dates_in_months(ld, tl lm)
+						  
