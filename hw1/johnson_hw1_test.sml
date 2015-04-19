@@ -121,3 +121,6 @@ what_month(244) = 9;
 what_month(274) = 10;
 what_month(305) = 11;
 what_month(335) = 12;
+
+month_range(1, 274) = [1,2,3,4,5,6,7,8,9,10];
+month_range(1, 32) = [1,2];

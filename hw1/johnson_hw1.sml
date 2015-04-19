@@ -59,3 +59,13 @@ fun what_month(d: int) =
   in number_before_reaching_sum(d, months) + 1
   end
 
+fun month_range(day1: int, day2: int) =
+  if day1 > day2
+  then []
+  else let fun range(from: int, to: int) =
+	     if from = to
+	     then [to]
+	     else from::range(from + 1, to)
+       in range(what_month(day1), what_month(day2))
+       end
+	   
