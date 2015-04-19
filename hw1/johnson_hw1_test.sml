@@ -38,6 +38,7 @@ number_in_months(ld, lm4) = 0;
 number_in_months(ld, lm5) = 4;
 number_in_months(ld, lm6) = 4;
 number_in_months([], lm2) = 0;
+number_in_months(ld, []) = 0;
 
 dates_in_month(ld, 1) = [d2];
 dates_in_month(ld, 2) = [];
@@ -54,3 +55,42 @@ dates_in_months(ld, lm4) = [];
 dates_in_months(ld, lm5) = [d2,d7,d4,d3];
 dates_in_months(ld, lm6) = [d1,d5,d6,d8];
 dates_in_months([], lm2) = [];
+dates_in_months(ld, []) = [];
+
+val list_strings = [
+    "DhM7n0CXyfc764",
+    "33fSUM0T6GMTbl",
+    "Vori9qgRabWRBj",
+    "M0Uu9wGyrrae4U",
+    "kKrWt6IJcuHOy4",
+    "R5mFpbLvRNyIFn",
+    "NEgZTUqj9Zt11j",
+    "I4JHoca8bp52r1",
+    "Zbm2T7eVRy7coq",
+    "mMKzXyaQQcZEcj",
+    "qbf0z543za85me",
+    "VzA9QvTG32IqHj",
+    "9Uq8NXLWtFjoUH",
+    "MLnwpc5GBxeXRN",
+    "5oFjFZe0cvMqFv",
+    "7hxHW4MS6vQHAa",
+    "AuB7uZ0rokrD8g",
+    "Wx8sqNiyl3BfAD",
+    "4DLNSrqy9HMvz1",
+    "o1AGwZO7I1HB7t",
+    "bTlVgBhV4Kl43e",
+    "3HnGsTpQ0KNYa3",
+    "LHIq5yYCGGAGst",
+    "S2eDPcrjtsrSVP",
+    "pjpUqzKyqgykG6",
+    "qvotiDks0PRzet",
+    "4c21Mlak1lXfCj",
+    "0krc3fYtFH0foE",
+    "55mL3uLrHCs7OK",
+    "T2WJ7CIEwuXbBz"
+];
+
+get_nth(list_strings, 1) = "DhM7n0CXyfc764";
+get_nth(list_strings, 10) = "mMKzXyaQQcZEcj";
+get_nth(list_strings, 15) = "5oFjFZe0cvMqFv";
+get_nth(list_strings, 3) = "Vori9qgRabWRBj";
