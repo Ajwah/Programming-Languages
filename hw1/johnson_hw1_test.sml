@@ -94,3 +94,10 @@ get_nth(list_strings, 1) = "DhM7n0CXyfc764";
 get_nth(list_strings, 10) = "mMKzXyaQQcZEcj";
 get_nth(list_strings, 15) = "5oFjFZe0cvMqFv";
 get_nth(list_strings, 3) = "Vori9qgRabWRBj";
+
+date_to_string(d1);
+date_to_string(d2);
+date_to_string(d3);
+date_to_string(d4);
+date_to_string(d5);
+date_to_string(d6);
