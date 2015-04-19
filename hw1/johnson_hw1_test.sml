@@ -346,3 +346,20 @@ oldest_test(rnd_years);
 
 number_in_months_challenge(ld, lm1 @ lm2 @ lm3 @ lm4 @ lm5 @ lm6) = 8;
 dates_in_months_challenge(ld, lm2 @ lm1 @ lm2 @ lm3 @ lm4 @ lm5 @ lm6 @ lm2) = [d2,d1,d5,d6,d8,d7,d4,d3];
+
+reasonable_date(d1) = true;
+reasonable_date(d2) = true;
+reasonable_date(d3) = true;
+reasonable_date(d4) = true;
+reasonable_date(d5) = true;
+reasonable_date(d6) = true;
+reasonable_date(d7) = false;
+reasonable_date(d8) = false;
+reasonable_date(1804,2,29) = true;
+reasonable_date(1804,2,30) = false;
+reasonable_date(2000,2,29) = true;
+reasonable_date(1999,13,1) = false;
+reasonable_date(2001,1,40) = false;
+reasonable_date(2002,4,31) = false;
+reasonable_date(2003,5,31) = true;
+reasonable_date(2004,12,31) = true;

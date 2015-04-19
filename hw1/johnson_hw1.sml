@@ -6,12 +6,7 @@ fun is_older(d1: int*int*int, d2: int*int*int) =
   else if (#2 d1) = (#2 d2) andalso (#3 d1) < (#3 d2)
   then true
   else false
-
-fun is_older2(d1: int*int*int, d2: int*int*int) =
-  if (#2 d1) < (#2 d2)
-  then true
-  else false
-	   
+  
 fun number_in_month(ld: (int*int*int) list, m: int) =
   if null ld
   then 0
@@ -112,9 +107,31 @@ fun remove_duplicates(l: int list) =
   end
 
 fun number_in_months_challenge(ld: (int*int*int) list, lm: int list) =
-  number_in_months(ld, remove_duplicates(lm));
+  number_in_months(ld, remove_duplicates(lm))
 
 fun dates_in_months_challenge(ld: (int*int*int) list, lm: int list) =
-  dates_in_months(ld, remove_duplicates(lm));
+  dates_in_months(ld, remove_duplicates(lm))
+
+fun reasonable_date(d: int*int*int) =
+  let
+      val year = #1 d
+      val month = #2 d 
+      val day = #3 d
+      val is_leapyear = year mod 400 = 0 orelse (year mod 4 = 0 andalso year mod 100 <> 0)
+      val is_reasonable_year = year > 0
+      val is_reasonable_month = month > 0 andalso month < 13
+      val get_months =
+	if is_leapyear
+	then [31,29,31,30,31,30,31,31,30,31,30,31]
+	else [31,28,31,30,31,30,31,31,30,31,30,31]
+      fun get_max_days_of_month(ml: int list, m: int) =
+	if m = 1 orelse not is_reasonable_month (*important bug fix. if invalid months are inputted then uncaught exception even though get_max_days_of_month should not get evaluated as it should get short circuited at failure of is_reasonable_month conjunction*)
+	then hd ml
+	else get_max_days_of_month(tl ml, m - 1)
+      val is_reasonable_day = day > 0 andalso day <= get_max_days_of_month(get_months, month)
+  in is_reasonable_year andalso is_reasonable_month andalso if is_reasonable_month
+							    then is_reasonable_day
+							    else false
+  end;
 
 use "johnson_hw1_test.sml";
