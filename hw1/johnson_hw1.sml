@@ -96,4 +96,25 @@ fun oldest_test(l: int list) =
 	  else max
        end;
 
+fun remove_duplicates(l: int list) =
+  let fun find(el: int, l: int list) =
+	if null l
+	then false
+	else if el = hd l
+	then true
+	else find(el, tl l)
+  in 
+      if null l
+      then []
+      else if find(hd l, tl l)
+      then remove_duplicates(tl l)
+      else (hd l)::remove_duplicates(tl l)
+  end
+
+fun number_in_months_challenge(ld: (int*int*int) list, lm: int list) =
+  number_in_months(ld, remove_duplicates(lm));
+
+fun dates_in_months_challenge(ld: (int*int*int) list, lm: int list) =
+  dates_in_months(ld, remove_duplicates(lm));
+
 use "johnson_hw1_test.sml";

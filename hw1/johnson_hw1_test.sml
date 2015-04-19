@@ -343,3 +343,6 @@ val rnd_years = [
 ];
 
 oldest_test(rnd_years);
+
+number_in_months_challenge(ld, lm1 @ lm2 @ lm3 @ lm4 @ lm5 @ lm6) = 8;
+dates_in_months_challenge(ld, lm2 @ lm1 @ lm2 @ lm3 @ lm4 @ lm5 @ lm6 @ lm2) = [d2,d1,d5,d6,d8,d7,d4,d3];
