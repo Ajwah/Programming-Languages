@@ -1,0 +1,49 @@
+(* Dan Grossman, CSE341 Spring 2013, HW2 Provided Tests *)
+
+val s1 = "CIvuNCJacBmzmN"
+val s2 = "xJeC3Oe6nJV4Cg"
+val s3 = "7IK3QAz2kNRCLs"
+val s4 = "i2oqTL6VTvJLUy"
+val s5 = "PMA3UfR5oYARjA"
+val s6 = "qoA5sTMLzuDRmb"
+val s7 = "MTmxbwXCSt5YLB"
+val s8 = "pp7htnOE3ag9Lq"
+val s9 = "urpWliQU08Gnk8"
+val s10 = "He1lIb6X0iu8IX"
+
+val sl1 = [s1,s2,s3,s4,s5,s6,s7,s8,s9,s10]
+val sl2 = ""::sl1
+val sl3 = []
+val sl4 = [""]
+val sl5 = ["1"];
+all_except_option("", sl2) = SOME sl1;
+all_except_option(s1,sl1) = SOME (tl sl1);
+all_except_option(s1,sl2) = SOME (""::(tl sl1));
+all_except_option(s2,sl3) = NONE;
+all_except_option("",sl1) = SOME sl1;
+all_except_option("",sl4) = SOME [];
+all_except_option("random",sl4) = SOME sl4;
+all_except_option("1",sl5) = SOME [];
+all_except_option(s6,sl1) = SOME [s1,s2,s3,s4,s5,s7,s8,s9,s10];
+all_except_option(s10,sl1) = SOME [s1,s2,s3,s4,s5,s7,s8,s9];
+
+(* These are just two tests for problem 2; you will want more.
+
+   Naturally these tests and your tests will use bindings defined 
+   in your solution, in particular the officiate function, 
+   so they will not type-check if officiate is not defined.
+ *)
+
+fun provided_test1 () = (* correct behavior: raise IllegalMove *)
+    let val cards = [(Clubs,Jack),(Spades,Num(8))]
+	val moves = [Draw,Discard(Hearts,Jack)]
+    in
+	officiate(cards,moves,42)
+    end
+
+fun provided_test2 () = (* correct behavior: return 3 *)
+    let val cards = [(Clubs,Ace),(Spades,Ace),(Clubs,Ace),(Spades,Ace)]
+	val moves = [Draw,Draw,Draw,Draw,Draw]
+    in
+ 	officiate(cards,moves,42)
+    end
