@@ -128,10 +128,8 @@ fun reasonable_date(d: int*int*int) =
 	if m = 1 orelse not is_reasonable_month (*important bug fix. if invalid months are inputted then uncaught exception even though get_max_days_of_month should not get evaluated as it should get short circuited at failure of is_reasonable_month conjunction*)
 	then hd ml
 	else get_max_days_of_month(tl ml, m - 1)
-      val is_reasonable_day = day > 0 andalso day <= get_max_days_of_month(get_months, month)
-  in is_reasonable_year andalso is_reasonable_month andalso if is_reasonable_month
-							    then is_reasonable_day
-							    else false
+      val is_reasonable_day = day > 0 andalso day <= get_max_days_of_month(get_months, month))
+  in is_reasonable_year andalso is_reasonable_month andalso is_reasonable_day
   end;
 
 use "johnson_hw1_test.sml";
