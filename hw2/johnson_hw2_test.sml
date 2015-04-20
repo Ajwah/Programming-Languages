@@ -1,5 +1,5 @@
 (* Dan Grossman, CSE341 Spring 2013, HW2 Provided Tests *)
-
+		   
 val s1 = "CIvuNCJacBmzmN"
 val s2 = "xJeC3Oe6nJV4Cg"
 val s3 = "7IK3QAz2kNRCLs"
@@ -16,6 +16,7 @@ val sl2 = ""::sl1
 val sl3 = []
 val sl4 = [""]
 val sl5 = ["1"];
+
 all_except_option("", sl2) = SOME sl1;
 all_except_option(s1,sl1) = SOME (tl sl1);
 all_except_option(s1,sl2) = SOME (""::(tl sl1));
@@ -25,7 +26,9 @@ all_except_option("",sl4) = SOME [];
 all_except_option("random",sl4) = SOME sl4;
 all_except_option("1",sl5) = SOME [];
 all_except_option(s6,sl1) = SOME [s1,s2,s3,s4,s5,s7,s8,s9,s10];
-all_except_option(s10,sl1) = SOME [s1,s2,s3,s4,s5,s7,s8,s9];
+all_except_option(s10,sl1) = SOME [s1,s2,s3,s4,s5,s6,s7,s8,s9];
+val sl6 = [s1,s2,s3,s4,s1,s5,s6,s7,s8,s9,s10,s1];
+all_except_option(s1,sl6)= SOME (tl sl1);
 
 (* These are just two tests for problem 2; you will want more.
 

@@ -8,15 +8,16 @@ fun same_string(s1 : string, s2 : string) =
 
 (* put your solutions for problem 1 here *)
 fun all_except_option(s, sl) =
-  case sl of
-      [] => NONE
-    | x::[] => if same_string(s,x) then SOME [] else all_except_option(s, [])
-    | x::xs'::xs'' => if same_string(s,x)
-		      then SOME (xs' :: xs'')
-		      else if same_string(s,xs')
-		      then SOME (x :: xs'')
-		      else all_except_option(s, xs'')
-
+  let fun helper(l) =
+	case l of
+	    [] => []
+	  | x::xs' => if same_string(s,x) then helper(xs') else x::helper(xs')
+  in
+      case sl of
+	  [] => NONE
+	| _ => SOME (helper(sl))
+  end
+     
 (* you may assume that Num is always used with values 2, 3, ..., 10
    though it will not really come up *)
 datatype suit = Clubs | Diamonds | Hearts | Spades
