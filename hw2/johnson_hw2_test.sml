@@ -93,6 +93,8 @@ if run_test(testcases_get_substitutions1(sort_list,get_substitutions2, sort_list
 then [("ALL TESTS PASSED FOR fun get_substitutions2",[],[])]
 else retrieve_failed_tests(testcases_get_substitutions1(sort_list,get_substitutions2, sort_list));
 
+similar_names([["Fred","Fredrick"],["Elizabeth","Betty"],["Freddie","Fred","F"]], {first="Fred", middle="W", last="Smith"}) = [
+    {first="Fred", last="Smith", middle="W"},{first="Fredrick", last="Smith", middle="W"},{first="Freddie", last="Smith", middle="W"},{first="F", last="Smith", middle="W"}];
 
 (* These are just two tests for problem 2; you will want more.
 

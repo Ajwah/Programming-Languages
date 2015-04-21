@@ -34,6 +34,15 @@ fun get_substitutions2(sl,s) =
 			| SOME l => helper(xs',l @ acc)
   in helper(sl,[])
   end
+
+fun similar_names(sl,{first,middle,last}) =
+  let fun helper(li) =
+	case li of
+	    [] => []
+	  | x::xs' => {first=x,last=last, middle=middle}::helper(xs')
+  in {first=first,last=last, middle=middle}::helper(get_substitutions1(sl, first))
+  end
+      
 (* you may assume that Num is always used with values 2, 3, ..., 10
    though it will not really come up *)
 datatype suit = Clubs | Diamonds | Hearts | Spades
