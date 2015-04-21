@@ -90,9 +90,18 @@ fun sum_cards(cs) =
 fun score(cs,g) =
   let val divider = if all_same_color(cs) then 2 else 1
       val sum = sum_cards(cs)
-      val prescore = if sum > g then sum - g else g - sum
+      val prescore = if sum > g then 3 * (sum - g) else g - sum
   in prescore div divider
   end
       
-fun officiate(c,m,i) = i;
+fun officiate(cds,moves,i) =
+  let fun helper(c,m,h) =
+	case (c,m) of
+	    ([],_) => score(h,i)
+	  | (_,[]) => score(h,i)
+	  | (_,(Discard crd)::xs') => helper(c,xs',remove_card(h,crd,IllegalMove))
+	  | (x::xs',(Draw)::ys') => helper(xs',ys',x::h)
+  in helper(cds,moves,[])
+  end;
+      
 use "johnson_hw2_test.sml";

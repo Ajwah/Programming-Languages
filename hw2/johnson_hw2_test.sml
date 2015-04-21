@@ -348,7 +348,7 @@ fun testcases_sum_cards(f) = [
 
 fun test_cases_score(f) = [
     ("1",f(lc1, 62), 0),
-    ("2",f(#Spades number,60), 2),
+    ("2",f(#Spades number,60), 3),
     ("3",f(#Clubs number,50),6),
     ("4",f(#Diamonds number,54),0),
     ("5",f(#Hearts number,80), 13),
@@ -357,7 +357,7 @@ fun test_cases_score(f) = [
     ("8",f(#Diamonds honors,40), 1),
     ("9",f(#Hearts honors,43),1),
     
-    ("10",f((Clubs,Queen)::(#Spades number),1),94 ),
+    ("10",f((Clubs,Queen)::(#Spades number),1),94),
     ("11",f((Spades,Queen)::(#Clubs number),100), 18),
     ("12",f((Hearts,King)::(#Diamonds number),64), 0),
     ("13",f((Diamonds,King)::(#Hearts number),63), 1),
@@ -376,7 +376,42 @@ fun test_cases_score(f) = [
     ("24",f(deck,360), 60),
     ("25",f([],10), 5),
     ("26",f([(Clubs, Ace)],1), 15),
-    ("27",f([(Clubs, Num(~10))],10),10)
+    ("27",f([(Clubs, Num(~10))],10),10),
+    ("28",f([(Clubs,Ace),(Spades,Ace),(Clubs,Ace),(Spades,Ace)],42),3)
+];
+
+fun test_cases_officiate(f, mvs) = [
+    ("1",f(lc1, mvs, 62), 0),
+    ("2",f(#Spades number, mvs, 60), 3),
+    ("3",f(#Clubs number, mvs, 50),6),
+    ("4",f(#Diamonds number, mvs, 54),0),
+    ("5",f(#Hearts number, mvs, 80), 13),
+    ("6",f(#Spades honors, mvs, 41), 0),
+    ("7",f(#Clubs honors, mvs, 42), 0),
+    ("8",f(#Diamonds honors, mvs, 40), 1),
+    ("9",f(#Hearts honors, mvs, 43),1),
+    
+    ("10",f((Clubs,Queen)::(#Spades number), mvs, 1),94),
+    ("11",f((Spades,Queen)::(#Clubs number), mvs, 100), 18),
+    ("12",f((Hearts,King)::(#Diamonds number), mvs, 64), 0),
+    ("13",f((Diamonds,King)::(#Hearts number), mvs, 63), 1),
+    
+    ("14",f((Diamonds,King)::(#Spades honors), mvs, 52), 1),
+    ("15",f((Hearts,King)::(#Clubs honors), mvs, 50), 3),
+    ("16",f((Spades,Queen)::(#Diamonds honors), mvs, 41), 30),
+    ("17",f((Clubs,Queen)::(#Hearts honors), mvs, 60), 9),
+    
+    ("18",f((#Spades number)@[(Diamonds,King)], mvs, 64), 0),
+    ("19",f((#Clubs number)@[(Hearts,King)], mvs, 6), 174),
+    ("20",f((#Diamonds number)@[(Spades,Queen)], mvs, 24), 120),
+    ("21",f((#Hearts number)@[(Clubs,Queen)], mvs, 664), 600),
+    ("22",f(lc2, mvs, 50), 66),
+    ("23",f(shuffled, mvs, 400), 20),
+    ("24",f(deck, mvs, 360), 60),
+    ("25",f([], mvs,10), 5),
+    ("26",f([(Clubs, Ace)], mvs, 1), 15),
+    ("27",f([(Clubs, Num(~10))], mvs, 10),10),
+    ("28",f([(Clubs,Ace),(Spades,Ace),(Clubs,Ace),(Spades,Ace)], mvs, 42),3)
 ];
 
 if run_test(testcases_all_same_colors(all_same_color))
@@ -389,7 +424,13 @@ else retrieve_failed_tests(testcases_sum_cards(sum_cards));
 
 if run_test(test_cases_score(score))
 then [("ALL TESTS PASSED FOR fun score",0,0)]
-else retrieve_failed_tests(testcases_sum_cards(sum_cards));
+else retrieve_failed_tests(test_cases_score(score));
+
+val mvs = [Draw,Draw,Draw,Draw,Draw,Draw,Draw,Draw,Draw,Draw,Draw,Draw,Draw,Draw,Draw,Draw,Draw,Draw,Draw,Draw,Draw,Draw,Draw,Draw,Draw,Draw,Draw,Draw,Draw,Draw,Draw,Draw,Draw,Draw,Draw,Draw,Draw,Draw,Draw,Draw,Draw,Draw,Draw,Draw,Draw,Draw,Draw,Draw,Draw,Draw,Draw,Draw,Draw,Draw];
+
+if run_test(test_cases_officiate(officiate,mvs))
+then [("ALL TESTS PASSED FOR fun officiate",0,0)]
+else retrieve_failed_tests(test_cases_officiate(officiate,mvs));
 
 fun provided_test1 () = (* correct behavior: raise IllegalMove *)
     let val cards = [(Clubs,Jack),(Spades,Num(8))]
@@ -403,4 +444,8 @@ fun provided_test2 () = (* correct behavior: return 3 *)
 	val moves = [Draw,Draw,Draw,Draw,Draw]
     in
  	officiate(cards,moves,42)
-    end
+    end;
+provided_test2();
+val ms1 = [Draw,Draw,Draw,Draw,Draw,Draw];
+officiate(lc1, ms1, 62);
+provided_test1();
