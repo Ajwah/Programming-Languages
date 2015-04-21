@@ -340,7 +340,10 @@ fun testcases_sum_cards(f) = [
     ("21",f((#Hearts number)@[(Clubs,Queen)]), 64),
     ("22",f(lc2), 72),
     ("23",f(shuffled), 380),
-    ("24",f(deck), 380)
+    ("24",f(deck), 380),
+    ("25",f([]), 0),
+    ("26",f([(Clubs, Ace)]), 11),
+    ("27",f([(Clubs, Num(~10))]), ~10)
 ];
 
 if run_test(testcases_all_same_colors(all_same_color))
