@@ -96,11 +96,12 @@ fun score(cs,g) =
       
 fun officiate(cds,moves,i) =
   let fun helper(c,m,h) =
-	case (c,m) of
-	    (_,[]) => score(h,i)
-	  | (_,(Discard crd)::xs') => helper(c,xs',remove_card(h,crd,IllegalMove))
-	  | ([],(Draw)::xs') => score(h,i)
-	  | (x::xs',(Draw)::ys') => helper(xs',ys',x::h)
+	case (c,m,sum_cards(h) > i) of
+	    (_,_,true) => score(h,i)
+	  | (_,[],false) => score(h,i)
+	  | (_,(Discard crd)::xs',false) => helper(c,xs',remove_card(h,crd,IllegalMove))
+	  | ([],(Draw)::xs',false) => score(h,i)
+	  | (x::xs',(Draw)::ys',false) => helper(xs',ys',x::h)
   in helper(cds,moves,[])
   end;
       

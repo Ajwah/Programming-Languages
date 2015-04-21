@@ -391,7 +391,7 @@ fun test_cases_officiate(f, mvs) = [
     ("8",f(#Diamonds honors, mvs, 40), 1),
     ("9",f(#Hearts honors, mvs, 43),1),
     
-    ("10",f((Clubs,Queen)::(#Spades number), mvs, 1),94),
+    ("10",f((Clubs,Queen)::(#Spades number), mvs, 1),13),
     ("11",f((Spades,Queen)::(#Clubs number), mvs, 100), 18),
     ("12",f((Hearts,King)::(#Diamonds number), mvs, 64), 0),
     ("13",f((Diamonds,King)::(#Hearts number), mvs, 63), 1),
@@ -402,12 +402,12 @@ fun test_cases_officiate(f, mvs) = [
     ("17",f((Clubs,Queen)::(#Hearts honors), mvs, 60), 9),
     
     ("18",f((#Spades number)@[(Diamonds,King)], mvs, 64), 0),
-    ("19",f((#Clubs number)@[(Hearts,King)], mvs, 6), 174),
-    ("20",f((#Diamonds number)@[(Spades,Queen)], mvs, 24), 120),
+    ("19",f((#Clubs number)@[(Hearts,King)], mvs, 6), 6),
+    ("20",f((#Diamonds number)@[(Spades,Queen)], mvs, 24), 9),
     ("21",f((#Hearts number)@[(Clubs,Queen)], mvs, 664), 600),
-    ("22",f(lc2, mvs, 50), 66),
+    ("22",f(lc2, mvs, 50), 12),
     ("23",f(shuffled, mvs, 400), 20),
-    ("24",f(deck, mvs, 360), 60),
+    ("24",f(deck, mvs, 360), 30),
     ("25",f([], mvs,10), 5),
     ("26",f([(Clubs, Ace)], mvs, 1), 15),
     ("27",f([(Clubs, Num(~10))], mvs, 10),10),
@@ -415,13 +415,13 @@ fun test_cases_officiate(f, mvs) = [
 ];
 
 fun test_cases_officiate2(f) = [
-    ("1",f(lc1, [Draw, Discard(Clubs, Ace)], 0), 0),
-    ("2",f(lc1, [Draw, Draw, Draw, Draw, Draw, Draw, Discard(Clubs,Ace),Discard(Spades,Ace),Discard(Clubs,Ace),Discard(Spades,Ace),Discard(Clubs,Jack),Discard(Spades,Num(8))], 0), 0),
-    ("3",f(lc1, [Draw, Draw, Draw, Draw,Discard(Clubs,Ace),Discard(Spades,Ace),Discard(Clubs,Ace), Draw, Draw, Discard(Spades,Ace),Discard(Clubs,Jack),Discard(Spades,Num(8))], 0), 0),
+    ("1",f(lc1, [Draw, Discard(Clubs, Ace)], 11), 5),
+    ("2",f(lc1, [Draw, Draw, Draw, Draw, Draw, Draw, Discard(Clubs,Ace),Discard(Spades,Ace),Discard(Clubs,Ace),Discard(Spades,Ace),Discard(Clubs,Jack),Discard(Spades,Num(8))], 62), 31),
+    ("3",f(lc1, [Draw, Draw, Draw, Draw,Discard(Clubs,Ace),Discard(Spades,Ace),Discard(Clubs,Ace), Draw, Draw, Discard(Spades,Ace),Discard(Clubs,Jack),Discard(Spades,Num(8))], 50), 25),
     ("4",f(lc1, [Draw, Draw, Draw, Draw, Draw, Draw, Draw, Discard(Clubs,Ace),Discard(Spades,Ace),Discard(Clubs,Ace),Discard(Spades,Ace),Discard(Clubs,Jack),Discard(Spades,Num(8))], 62), 0),
-    ("5",f(lc1,[Draw,Discard(Clubs,Ace),Draw,Discard(Spades,Ace),Draw,Discard(Clubs,Ace),Draw,Discard(Spades,Ace),Draw,Discard(Clubs,Jack),Draw,Discard(Spades,Num(8))], 0), 0),
-    ("6",f(lc1,[Draw,Discard(Clubs,Ace),Draw,Discard(Spades,Ace),Draw,Discard(Clubs,Ace),Draw,Discard(Spades,Ace),Draw,Discard(Clubs,Jack),Draw,Discard(Spades,Num(8)),Draw,Draw], 0), 0),
-    ("7", f(lc1,[Draw,Draw,Discard(Clubs,Ace),Draw,Discard(Spades,Ace),Draw,Discard(Clubs,Ace),Draw,Discard(Spades,Ace),Draw,Discard(Clubs,Jack),Draw,Discard(Spades,Num(8))], 8), 0)
+    ("5",f(lc1,[Draw,Discard(Clubs,Ace),Draw,Discard(Spades,Ace),Draw,Discard(Clubs,Ace),Draw,Discard(Spades,Ace),Draw,Discard(Clubs,Jack),Draw,Discard(Spades,Num(8))], 16), 8),
+    ("6",f(lc1,[Draw,Discard(Clubs,Ace),Draw,Discard(Spades,Ace),Draw,Discard(Clubs,Ace),Draw,Discard(Spades,Ace),Draw,Discard(Clubs,Jack),Draw,Discard(Spades,Num(8)),Draw,Draw], 16), 8),
+    ("7", f(lc1,[Draw,Draw,Discard(Clubs,Ace),Draw,Discard(Spades,Ace),Draw,Discard(Clubs,Ace),Draw,Discard(Spades,Ace),Draw,Discard(Clubs,Jack),Draw,Discard(Spades,Num(8))], 30), 11)
 ];
 
 if run_test(testcases_all_same_colors(all_same_color))
@@ -459,7 +459,5 @@ fun provided_test2 () = (* correct behavior: return 3 *)
     in
  	officiate(cards,moves,42)
     end;
-provided_test2();
-val ms1 = [Draw,Draw,Draw,Draw,Draw,Draw];
-officiate(lc1, ms1, 62);
-officiate(lc1, [Draw,Draw, Discard(Clubs,Ace), Discard(Spades,Ace),Draw,Draw], 20);
+provided_test2() = 3;
+provided_test1() handle IllegalMove => 1;
