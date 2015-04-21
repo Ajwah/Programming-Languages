@@ -24,7 +24,16 @@ fun get_substitutions1(sl,s) =
     | x::xs' => case all_except_option(s, x) of
 		    NONE => get_substitutions1(xs',s)
 		  | SOME l => l @ get_substitutions1(xs',s)
-     
+
+fun get_substitutions2(sl,s) =
+  let fun helper(li, acc) =
+	case li of
+	    [] => acc
+	  | x::xs' => case all_except_option(s,x) of
+			  NONE => helper(xs',acc)
+			| SOME l => helper(xs',l @ acc)
+  in helper(sl,[])
+  end
 (* you may assume that Num is always used with values 2, 3, ..., 10
    though it will not really come up *)
 datatype suit = Clubs | Diamonds | Hearts | Spades
