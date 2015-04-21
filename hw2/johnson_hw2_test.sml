@@ -346,12 +346,49 @@ fun testcases_sum_cards(f) = [
     ("27",f([(Clubs, Num(~10))]), ~10)
 ];
 
+fun test_cases_score(f) = [
+    ("1",f(lc1, 62), 0),
+    ("2",f(#Spades number,60), 2),
+    ("3",f(#Clubs number,50),6),
+    ("4",f(#Diamonds number,54),0),
+    ("5",f(#Hearts number,80), 13),
+    ("6",f(#Spades honors,41), 0),
+    ("7",f(#Clubs honors,42), 0),
+    ("8",f(#Diamonds honors,40), 1),
+    ("9",f(#Hearts honors,43),1),
+    
+    ("10",f((Clubs,Queen)::(#Spades number),1),94 ),
+    ("11",f((Spades,Queen)::(#Clubs number),100), 18),
+    ("12",f((Hearts,King)::(#Diamonds number),64), 0),
+    ("13",f((Diamonds,King)::(#Hearts number),63), 1),
+    
+    ("14",f((Diamonds,King)::(#Spades honors),52), 1),
+    ("15",f((Hearts,King)::(#Clubs honors),50), 3),
+    ("16",f((Spades,Queen)::(#Diamonds honors),41), 30),
+    ("17",f((Clubs,Queen)::(#Hearts honors),60), 9),
+    
+    ("18",f((#Spades number)@[(Diamonds,King)],64), 0),
+    ("19",f((#Clubs number)@[(Hearts,King)],6), 174),
+    ("20",f((#Diamonds number)@[(Spades,Queen)],24), 120),
+    ("21",f((#Hearts number)@[(Clubs,Queen)],664), 600),
+    ("22",f(lc2,50), 66),
+    ("23",f(shuffled,400), 20),
+    ("24",f(deck,360), 60),
+    ("25",f([],10), 5),
+    ("26",f([(Clubs, Ace)],1), 15),
+    ("27",f([(Clubs, Num(~10))],10),10)
+];
+
 if run_test(testcases_all_same_colors(all_same_color))
 then [("ALL TESTS PASSED FOR fun all_same_color",true,true)]
 else retrieve_failed_tests(testcases_all_same_colors(all_same_color));
 
 if run_test(testcases_sum_cards(sum_cards))
 then [("ALL TESTS PASSED FOR fun sum_cards",0,0)]
+else retrieve_failed_tests(testcases_sum_cards(sum_cards));
+
+if run_test(test_cases_score(score))
+then [("ALL TESTS PASSED FOR fun score",0,0)]
 else retrieve_failed_tests(testcases_sum_cards(sum_cards));
 
 fun provided_test1 () = (* correct behavior: raise IllegalMove *)

@@ -86,6 +86,13 @@ fun sum_cards(cs) =
 	  | x::xs' => helper(xs', card_value(x) + acc)
   in helper(cs,0)
   end
+
+fun score(cs,g) =
+  let val divider = if all_same_color(cs) then 2 else 1
+      val sum = sum_cards(cs)
+      val prescore = if sum > g then sum - g else g - sum
+  in prescore div divider
+  end
       
 fun officiate(c,m,i) = i;
 use "johnson_hw2_test.sml";
