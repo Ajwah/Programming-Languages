@@ -103,6 +103,219 @@ similar_names([["Fred","Fredrick"],["Elizabeth","Betty"],["Freddie","Fred","F"]]
    so they will not type-check if officiate is not defined.
  *)
 
+val number = {
+Spades=[
+(Spades,Num(10)),
+(Spades,Num(2)),
+(Spades,Num(3)),
+(Spades,Num(4)),
+(Spades,Num(5)),
+(Spades,Num(6)),
+(Spades,Num(7)),
+(Spades,Num(8)),
+(Spades,Num(9))],
+Clubs=[
+(Clubs,Num(10)),
+(Clubs,Num(2)),
+(Clubs,Num(3)),
+(Clubs,Num(4)),
+(Clubs,Num(5)),
+(Clubs,Num(6)),
+(Clubs,Num(7)),
+(Clubs,Num(8)),
+(Clubs,Num(9))],
+Hearts=[
+(Hearts,Num(10)),
+(Hearts,Num(2)),
+(Hearts,Num(3)),
+(Hearts,Num(4)),
+(Hearts,Num(5)),
+(Hearts,Num(6)),
+(Hearts,Num(7)),
+(Hearts,Num(8)),
+(Hearts,Num(9))],
+Diamonds=[
+(Diamonds,Num(10)),
+(Diamonds,Num(2)),
+(Diamonds,Num(3)),
+(Diamonds,Num(4)),
+(Diamonds,Num(5)),
+(Diamonds,Num(6)),
+(Diamonds,Num(7)),
+(Diamonds,Num(8)),
+(Diamonds,Num(9))]
+};
+
+val honors ={
+Spades=[
+(Spades,Queen),
+(Spades,Ace),
+(Spades,Jack),
+(Spades,King)],
+
+Diamonds=[
+(Diamonds,Queen),
+(Diamonds,Ace),
+(Diamonds,Jack),
+(Diamonds,King)],
+
+Hearts=[
+(Hearts,Queen),
+(Hearts,Ace),
+(Hearts,Jack),
+(Hearts,King)],
+
+Clubs=[
+(Clubs,Queen),
+(Clubs,Ace),
+(Clubs,Jack),
+(Clubs,King)]
+};
+
+val shuffled = [
+(Spades,Num(5)),
+(Hearts,Num(7)),
+(Diamonds,Num(4)),
+(Diamonds,Num(6)),
+(Hearts,Ace),
+(Clubs,Queen),
+(Hearts,Num(5)),
+(Hearts,Queen),
+(Clubs,Jack),
+(Hearts,King),
+(Spades,Num(4)),
+(Diamonds,King),
+(Spades,Ace),
+(Hearts,Num(8)),
+(Hearts,Num(3)),
+(Hearts,Num(6)),
+(Hearts,Jack),
+(Spades,Num(3)),
+(Diamonds,Num(5)),
+(Clubs,Num(4)),
+(Spades,Num(8)),
+(Spades,Num(6)),
+(Hearts,Num(4)),
+(Diamonds,Ace),
+(Clubs,Num(3)),
+(Diamonds,Num(7)),
+(Hearts,Num(9)),
+(Spades,Num(9)),
+(Clubs,King),
+(Spades,Queen),
+(Clubs,Num(9)),
+(Clubs,Num(10)),
+(Diamonds,Num(9)),
+(Clubs,Num(7)),
+(Diamonds,Queen),
+(Diamonds,Num(10)),
+(Diamonds,Num(2)),
+(Clubs,Ace),
+(Clubs,Num(8)),
+(Spades,Jack),
+(Hearts,Num(2)),
+(Clubs,Num(5)),
+(Spades,Num(10)),
+(Spades,Num(2)),
+(Spades,Num(7)),
+(Diamonds,Num(8)),
+(Clubs,Num(2)),
+(Diamonds,Jack),
+(Diamonds,Num(3)),
+(Spades,King),
+(Clubs,Num(6))
+];
+
+val deck = [
+(Spades,Num(10)),
+(Spades,Num(2)),
+(Spades,Num(3)),
+(Spades,Num(4)),
+(Spades,Num(5)),
+(Spades,Num(6)),
+(Spades,Num(7)),
+(Spades,Num(8)),
+(Spades,Num(9)),
+(Clubs,Num(10)),
+(Clubs,Num(2)),
+(Clubs,Num(3)),
+(Clubs,Num(4)),
+(Clubs,Num(5)),
+(Clubs,Num(6)),
+(Clubs,Num(7)),
+(Clubs,Num(8)),
+(Clubs,Num(9)),
+(Hearts,Num(10)),
+(Hearts,Num(2)),
+(Hearts,Num(3)),
+(Hearts,Num(4)),
+(Hearts,Num(5)),
+(Hearts,Num(6)),
+(Hearts,Num(7)),
+(Hearts,Num(8)),
+(Hearts,Num(9)),
+(Diamonds,Num(10)),
+(Diamonds,Num(2)),
+(Diamonds,Num(3)),
+(Diamonds,Num(4)),
+(Diamonds,Num(5)),
+(Diamonds,Num(6)),
+(Diamonds,Num(7)),
+(Diamonds,Num(8)),
+(Diamonds,Num(9)),
+(Spades,Queen),
+(Spades,Ace),
+(Spades,Jack),
+(Spades,King),
+(Diamonds,Queen),
+(Diamonds,Ace),
+(Diamonds,Jack),
+(Diamonds,King),
+(Hearts,Queen),
+(Hearts,Ace),
+(Hearts,Jack),
+(Hearts,King),
+(Clubs,Queen),
+(Clubs,Ace),
+(Clubs,Jack),
+(Clubs,King)
+];
+
+val lc1 = [(Clubs,Ace),(Spades,Ace),(Clubs,Ace),(Spades,Ace),(Clubs,Jack),(Spades,Num(8))];
+val lc2 = [(Clubs,Ace),(Spades,Ace),(Clubs,Ace),(Hearts,King),(Spades,Ace),(Clubs,Jack),(Spades,Num(8))];
+fun testcases_all_same_colors(f) = [
+    ("1",f(lc1), true),
+    ("2",f(#Spades number), true),
+    ("3",f(#Clubs number), true),
+    ("4",f(#Diamonds number), true),
+    ("5",f(#Hearts number), true),
+    ("6",f(#Spades honors), true),
+    ("7",f(#Clubs honors), true),
+    ("8",f(#Diamonds honors), true),
+    ("9",f(#Hearts honors), true),
+    
+    ("10",f((Clubs,Queen)::(#Spades number)), true),
+    ("11",f((Spades,Queen)::(#Clubs number)), true),
+    ("12",f((Hearts,King)::(#Diamonds number)), true),
+    ("13",f((Diamonds,King)::(#Hearts number)), true),
+    
+    ("14",f((Diamonds,King)::(#Spades honors)), false),
+    ("15",f((Hearts,King)::(#Clubs honors)), false),
+    ("16",f((Spades,Queen)::(#Diamonds honors)), false),
+    ("17",f((Clubs,Queen)::(#Hearts honors)), false),
+    ("18",f((#Spades number)@[(Diamonds,King)]), false),
+    ("19",f((#Clubs number)@[(Hearts,King)]), false),
+    ("20",f((#Diamonds number)@[(Spades,Queen)]), false),
+    ("21",f((#Hearts number)@[(Clubs,Queen)]), false),
+    ("22",f(lc2), false),
+    ("23",f(shuffled), false),
+    ("24",f(deck), false)
+];
+
+if run_test(testcases_all_same_colors(all_same_color))
+then [("ALL TESTS PASSED FOR fun all_same_color",true,true)]
+else retrieve_failed_tests(testcases_all_same_colors(all_same_color));
+
 fun provided_test1 () = (* correct behavior: raise IllegalMove *)
     let val cards = [(Clubs,Jack),(Spades,Num(8))]
 	val moves = [Draw,Discard(Hearts,Jack)]

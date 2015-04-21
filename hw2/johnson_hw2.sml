@@ -55,6 +55,28 @@ datatype move = Discard of card | Draw
 exception IllegalMove
 
 (* put your solutions for problem 2 here *)
-	      
+fun card_color(suit,rank) =
+  case suit of
+      Clubs => Black
+    | Spades => Black
+    | _ => Red
+
+fun card_value(suit,rank) =
+  case rank of
+      Ace => 11
+    | Num x => x
+    | _ => 10
+
+fun remove_card(cs,c,e) =
+  case cs of
+      [] => raise e
+    | x::xs' => if x = c then xs' else x::remove_card(xs',c,e)
+
+fun all_same_color(cs) =
+  case cs of
+      [] => true
+    | x::[] => true
+    | x::xs'::[] => card_color(x) = card_color(xs')
+    | x::xs'::xs'' => if card_color(x) = card_color(xs') then all_same_color(xs'::xs'') else false
 fun officiate(c,m,i) = i;
 use "johnson_hw2_test.sml";
