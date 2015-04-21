@@ -17,6 +17,8 @@ fun all_except_option(s, sl) =
 	  [] => NONE
 	| _ => SOME (helper(sl))
   end
+
+fun get_substitutions1(x,y) = true
      
 (* you may assume that Num is always used with values 2, 3, ..., 10
    though it will not really come up *)
