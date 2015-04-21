@@ -15,10 +15,15 @@ fun all_except_option(s, sl) =
   in
       case sl of
 	  [] => NONE
-	| _ => SOME (helper(sl))
+        | _ => if helper(sl) = sl then NONE else SOME(helper(sl))
   end
 
-fun get_substitutions1(x,y) = true
+fun get_substitutions1(sl,s) =
+  case sl of
+      [] => []
+    | x::xs' => case all_except_option(s, x) of
+		    NONE => get_substitutions1(xs',s)
+		  | SOME l => l @ get_substitutions1(xs',s)
      
 (* you may assume that Num is always used with values 2, 3, ..., 10
    though it will not really come up *)
