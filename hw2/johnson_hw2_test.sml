@@ -414,6 +414,16 @@ fun test_cases_officiate(f, mvs) = [
     ("28",f([(Clubs,Ace),(Spades,Ace),(Clubs,Ace),(Spades,Ace)], mvs, 42),3)
 ];
 
+fun test_cases_officiate2(f) = [
+    ("1",f(lc1, [Draw, Discard(Clubs, Ace)], 0), 0),
+    ("2",f(lc1, [Draw, Draw, Draw, Draw, Draw, Draw, Discard(Clubs,Ace),Discard(Spades,Ace),Discard(Clubs,Ace),Discard(Spades,Ace),Discard(Clubs,Jack),Discard(Spades,Num(8))], 0), 0),
+    ("3",f(lc1, [Draw, Draw, Draw, Draw,Discard(Clubs,Ace),Discard(Spades,Ace),Discard(Clubs,Ace), Draw, Draw, Discard(Spades,Ace),Discard(Clubs,Jack),Discard(Spades,Num(8))], 0), 0),
+    ("4",f(lc1, [Draw, Draw, Draw, Draw, Draw, Draw, Draw, Discard(Clubs,Ace),Discard(Spades,Ace),Discard(Clubs,Ace),Discard(Spades,Ace),Discard(Clubs,Jack),Discard(Spades,Num(8))], 62), 0),
+    ("5",f(lc1,[Draw,Discard(Clubs,Ace),Draw,Discard(Spades,Ace),Draw,Discard(Clubs,Ace),Draw,Discard(Spades,Ace),Draw,Discard(Clubs,Jack),Draw,Discard(Spades,Num(8))], 0), 0),
+    ("6",f(lc1,[Draw,Discard(Clubs,Ace),Draw,Discard(Spades,Ace),Draw,Discard(Clubs,Ace),Draw,Discard(Spades,Ace),Draw,Discard(Clubs,Jack),Draw,Discard(Spades,Num(8)),Draw,Draw], 0), 0),
+    ("7", f(lc1,[Draw,Draw,Discard(Clubs,Ace),Draw,Discard(Spades,Ace),Draw,Discard(Clubs,Ace),Draw,Discard(Spades,Ace),Draw,Discard(Clubs,Jack),Draw,Discard(Spades,Num(8))], 8), 0)
+];
+
 if run_test(testcases_all_same_colors(all_same_color))
 then [("ALL TESTS PASSED FOR fun all_same_color",true,true)]
 else retrieve_failed_tests(testcases_all_same_colors(all_same_color));
@@ -432,6 +442,10 @@ if run_test(test_cases_officiate(officiate,mvs))
 then [("ALL TESTS PASSED FOR fun officiate",0,0)]
 else retrieve_failed_tests(test_cases_officiate(officiate,mvs));
 
+if run_test(test_cases_officiate2(officiate))
+then [("ALL TESTS PASSED FOR fun officiate2",0,0)]
+else retrieve_failed_tests(test_cases_officiate2(officiate));
+
 fun provided_test1 () = (* correct behavior: raise IllegalMove *)
     let val cards = [(Clubs,Jack),(Spades,Num(8))]
 	val moves = [Draw,Discard(Hearts,Jack)]
@@ -448,4 +462,4 @@ fun provided_test2 () = (* correct behavior: return 3 *)
 provided_test2();
 val ms1 = [Draw,Draw,Draw,Draw,Draw,Draw];
 officiate(lc1, ms1, 62);
-provided_test1();
+officiate(lc1, [Draw,Draw, Discard(Clubs,Ace), Discard(Spades,Ace),Draw,Draw], 20);
