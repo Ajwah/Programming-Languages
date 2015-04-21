@@ -208,6 +208,7 @@ val shuffled = [
 (Diamonds,Num(9)),
 (Clubs,Num(7)),
 (Diamonds,Queen),
+(Hearts,Num(10)),
 (Diamonds,Num(10)),
 (Diamonds,Num(2)),
 (Clubs,Ace),
@@ -312,9 +313,43 @@ fun testcases_all_same_colors(f) = [
     ("24",f(deck), false)
 ];
 
+fun testcases_sum_cards(f) = [
+    ("1",f(lc1), 62),
+    ("2",f(#Spades number), 54),
+    ("3",f(#Clubs number), 54),
+    ("4",f(#Diamonds number), 54),
+    ("5",f(#Hearts number), 54),
+    ("6",f(#Spades honors), 41),
+    ("7",f(#Clubs honors), 41),
+    ("8",f(#Diamonds honors), 41),
+    ("9",f(#Hearts honors), 41),
+    
+    ("10",f((Clubs,Queen)::(#Spades number)), 64),
+    ("11",f((Spades,Queen)::(#Clubs number)), 64),
+    ("12",f((Hearts,King)::(#Diamonds number)), 64),
+    ("13",f((Diamonds,King)::(#Hearts number)), 64),
+    
+    ("14",f((Diamonds,King)::(#Spades honors)), 51),
+    ("15",f((Hearts,King)::(#Clubs honors)), 51),
+    ("16",f((Spades,Queen)::(#Diamonds honors)), 51),
+    ("17",f((Clubs,Queen)::(#Hearts honors)), 51),
+    
+    ("18",f((#Spades number)@[(Diamonds,King)]), 64),
+    ("19",f((#Clubs number)@[(Hearts,King)]), 64),
+    ("20",f((#Diamonds number)@[(Spades,Queen)]), 64),
+    ("21",f((#Hearts number)@[(Clubs,Queen)]), 64),
+    ("22",f(lc2), 72),
+    ("23",f(shuffled), 380),
+    ("24",f(deck), 380)
+];
+
 if run_test(testcases_all_same_colors(all_same_color))
 then [("ALL TESTS PASSED FOR fun all_same_color",true,true)]
 else retrieve_failed_tests(testcases_all_same_colors(all_same_color));
+
+if run_test(testcases_sum_cards(sum_cards))
+then [("ALL TESTS PASSED FOR fun sum_cards",0,0)]
+else retrieve_failed_tests(testcases_sum_cards(sum_cards));
 
 fun provided_test1 () = (* correct behavior: raise IllegalMove *)
     let val cards = [(Clubs,Jack),(Spades,Num(8))]

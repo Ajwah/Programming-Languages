@@ -78,5 +78,14 @@ fun all_same_color(cs) =
     | x::[] => true
     | x::xs'::[] => card_color(x) = card_color(xs')
     | x::xs'::xs'' => if card_color(x) = card_color(xs') then all_same_color(xs'::xs'') else false
+
+fun sum_cards(cs) =
+  let fun helper(cl, acc) =
+	case cl of
+	    [] => acc
+	  | x::xs' => helper(xs', card_value(x) + acc)
+  in helper(cs,0)
+  end
+      
 fun officiate(c,m,i) = i;
 use "johnson_hw2_test.sml";
