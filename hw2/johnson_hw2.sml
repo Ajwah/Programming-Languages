@@ -146,8 +146,28 @@ fun officiate_challenge(cds,moves,i) =
 	   else officiate(cs,moves,i)::container(replaced, repl_moves)
 	end
    in least_of(container(cds, moves))
-   end;
-		       
+  end;
+
+fun careful_player(cs,g) =
+  let fun research_discard(held, new_card, total_value) =
+	case held of
+	    [] => NONE
+	  | card::xs' => if total_value - card_value(card) + card_value(new_card) = 0
+			 then SOME([Discard(card),Draw])
+			 else research_discard(xs', new_card, total_value)
+	  
+      fun helper(cs,held,moves) =
+	case (cs, score(held,g) = 0 andalso not(null(held))) of
+	    (_,true) => moves
+	  | ([],false) => moves
+	  | (card::xs',false) => if sum_cards(held) <= g + 11
+				 then helper(xs',held@[card],moves@[Draw])
+				 else case research_discard(held, card, sum_cards(held)) of
+					  NONE => moves
+					| SOME(move) => helper(xs',held@[card],moves@move)
+  in helper(cs,[],[])
+  end;
+
 use "johnson_hw2_test.sml";
 
 (*
