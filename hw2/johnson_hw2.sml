@@ -104,5 +104,52 @@ fun officiate(cds,moves,i) =
 	  | (x::xs',(Draw)::ys',false) => helper(xs',ys',x::h)
   in helper(cds,moves,[])
   end;
-      
+
+fun replace_one_ace(cs) =
+  case cs of
+      [] => []
+    | (c, Ace)::xs' => (c,Num(1))::xs'
+    | card::xs' => card::replace_one_ace(xs')
+
+fun replace_one_ace_move(cs) =
+  case cs of
+      [] => []
+    | Discard(c, Ace)::xs' => Discard(c,Num(1))::xs'
+    | card::xs' => card::replace_one_ace_move(xs')					
+
+fun least_of(ls) =
+  case ls of
+      [] => 0
+    | x::[] => x
+    | x::xs' => let val min = least_of(xs')
+		in if min < x
+		   then min
+		   else x
+		end;
+				     
+fun score_challenge(cs,g) =
+  let fun container(cs) =
+	let val replaced = replace_one_ace(cs)
+	in if cs = replaced
+	   then [score(cs,g)]
+	   else score(cs,g)::container(replaced)
+	end
+  in least_of(container(cs))
+  end;
+
+fun officiate_challenge(cds,moves,i) =
+  let fun container(cs, moves) =
+	let val replaced = replace_one_ace(cs)
+	    val repl_moves = replace_one_ace_move(moves)
+	in if cs = replaced
+	   then [officiate(cs,moves,i)]
+	   else officiate(cs,moves,i)::container(replaced, repl_moves)
+	end
+   in least_of(container(cds, moves))
+   end;
+		       
 use "johnson_hw2_test.sml";
+
+(*
+
+*)

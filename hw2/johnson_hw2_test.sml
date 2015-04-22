@@ -446,6 +446,14 @@ if run_test(test_cases_officiate2(officiate))
 then [("ALL TESTS PASSED FOR fun officiate2",0,0)]
 else retrieve_failed_tests(test_cases_officiate2(officiate));
 
+if run_test(test_cases_officiate(officiate_challenge,mvs))
+then [("ALL TESTS PASSED FOR fun officiate_challenge",0,0)]
+else retrieve_failed_tests(test_cases_officiate(officiate_challenge,mvs));
+
+if run_test(test_cases_officiate2(officiate_challenge))
+then [("ALL TESTS PASSED FOR fun officiate_challenge2",0,0)]
+else retrieve_failed_tests(test_cases_officiate2(officiate_challenge));
+
 fun provided_test1 () = (* correct behavior: raise IllegalMove *)
     let val cards = [(Clubs,Jack),(Spades,Num(8))]
 	val moves = [Draw,Discard(Hearts,Jack)]
@@ -461,3 +469,15 @@ fun provided_test2 () = (* correct behavior: return 3 *)
     end;
 provided_test2() = 3;
 provided_test1() handle IllegalMove => 1;
+score_challenge(lc1,10);
+score_challenge(lc2,10);
+score_challenge(deck,10);
+score_challenge(shuffled,10);
+score_challenge(lc1,50);
+score_challenge(lc2,50);
+score_challenge(deck,50);
+score_challenge(shuffled,50);
+score_challenge(deck,300);
+score_challenge(shuffled,500);
+score_challenge(deck,350);
+score_challenge(shuffled,450);
