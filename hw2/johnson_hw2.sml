@@ -152,15 +152,15 @@ fun careful_player(cs,g) =
   let fun research_discard(held, new_card, total_value) =
 	case held of
 	    [] => NONE
-	  | card::xs' => if total_value - card_value(card) + card_value(new_card) = 0
+	  | card::xs' => if total_value - card_value(card) + card_value(new_card) = g
 			 then SOME([Discard(card),Draw])
 			 else research_discard(xs', new_card, total_value)
 	  
       fun helper(cs,held,moves) =
-	case (cs, score(held,g) = 0 andalso not(null(held))) of
+	case (cs, score(held,g) = 0) of
 	    (_,true) => moves
 	  | ([],false) => moves
-	  | (card::xs',false) => if sum_cards(held) <= g + 11
+	  | (card::xs',false) => if sum_cards(held) <= g - 11
 				 then helper(xs',held@[card],moves@[Draw])
 				 else case research_discard(held, card, sum_cards(held)) of
 					  NONE => moves
@@ -171,5 +171,5 @@ fun careful_player(cs,g) =
 use "johnson_hw2_test.sml";
 
 (*
-
+f([(Clubs,Ace),(Hearts,Num(5)),(Spades,Ace),(Clubs,Jack)],22);
 *)
