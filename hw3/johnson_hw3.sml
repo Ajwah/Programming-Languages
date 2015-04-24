@@ -35,3 +35,11 @@ datatype typ = Anything
 	     | Datatype of string
 
 (**** you can put all your code here ****)
+fun only_capitals(ls) = List.filter (fn(x) => case size x of
+						  0 => false
+						| _ => Char.isUpper(String.sub(x,0))) ls
+				    
+fun longest_string1(ls) = foldl(fn(x,y) => if size x > size y then x else y) "" ls
+			       
+					  
+  
