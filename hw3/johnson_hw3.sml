@@ -48,4 +48,12 @@ val longest_string4 = longest_string_helper(fn(x,y) => if size x >= size y then 
 *)
 
 val longest_capitalized = longest_string1 o only_capitals
-						
+
+(*Important note for function below:
+fun rev_string(s: string) = implode o rev o explode s 
+will not work
+
+http://stackoverflow.com/questions/12729640/why-is-there-type-mismatch-of-operator-and-operand
+*)
+fun rev_string(s) = (implode o rev o explode) s
+					    
