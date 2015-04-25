@@ -103,7 +103,11 @@ val tests = [
     ("5.40 Plenty element List: ALL equal length", longest_capitalized ["Ss6CmxYH9KAr","Ssu40waWdFvM","Ss6CmxYH9KAr","SsDW0wQKwWu7","SsASt81VnTZY","SsENkyvsBJf6","SsfPvrv723iB","Ssu40waWdFvM","Ssb9lgY0DxVo","Ssb9lgY0DxVo"] = "Ss6CmxYH9KAr"),
     ("5.41 Plenty element List: ALL Different Length. Big To Small", longest_capitalized ["Cu40waWdFvM","CfPvrv723i","CfPvrv723","CfPvrv72","Cb9lgY0","CDKoLm","CDW0w","Cb9l","CDW","C1"] = "Cu40waWdFvM"),
     ("5.42 Plenty element List: All Different Length. Small To Big", longest_capitalized ["SE","S1bX","Su40","SfPvr","SDKoLm","Sb9lgY0","SfPvrv72","SENkyvsBJ","Su40waWdFv","Su40waWdFvM"] = "Su40waWdFvM"),
-    ("5.43 Plenty element List: All Different Length. Random", longest_capitalized ["SE","SDKoLm","Sb9lgY0","S1bX","SfPvr","Su40waWdFvM","SfPvrv72","SENkyvsBJ","Su40","Su40waWdFv"] = "Su40waWdFvM")
+    ("5.43 Plenty element List: All Different Length. Random", longest_capitalized ["SE","SDKoLm","Sb9lgY0","S1bX","SfPvr","Su40waWdFvM","SfPvrv72","SENkyvsBJ","Su40","Su40waWdFv"] = "Su40waWdFvM"),
+
+    ("6.10 Empty String", rev_string("") = ""),
+    ("6.11 one letter", rev_string("t") = "t"),
+    ("6.12 one word", rev_string("Test") = "tseT")
 
 
 ];
