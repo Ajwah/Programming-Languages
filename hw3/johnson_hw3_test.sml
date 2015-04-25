@@ -69,8 +69,43 @@ val tests = [
     ("3.40 Plenty element List: ALL equal length", longest_string2(["s6CmxYH9KAr","su40waWdFvM","s6CmxYH9KAr","sDW0wQKwWu7","sASt81VnTZY","sENkyvsBJf6","sfPvrv723iB","su40waWdFvM","sb9lgY0DxVo","sb9lgY0DxVo"]) = "sb9lgY0DxVo"),
     ("3.41 Plenty element List: ALL Different Length. Big To Small", longest_string2(["Cu40waWdFvM","CfPvrv723i","CfPvrv723","CfPvrv72","Cb9lgY0","CDKoLm","CDW0w","Cb9l","CDW","C1"]) = "Cu40waWdFvM"),
     ("3.42 Plenty element List: All Different Length. Small To Big", longest_string2(["E","1bX","u40","fPvr","DKoLm","b9lgY0","fPvrv72","ENkyvsBJ","u40waWdFv","u40waWdFvM"]) = "u40waWdFvM"),
-    ("3.43 Plenty element List: All Different Length. Random", longest_string2(["E","DKoLm","b9lgY0","1bX","fPvr","u40waWdFvM","fPvrv72","ENkyvsBJ","u40","u40waWdFv"]) = "u40waWdFvM")
-	
+    ("3.43 Plenty element List: All Different Length. Random", longest_string2(["E","DKoLm","b9lgY0","1bX","fPvr","u40waWdFvM","fPvrv72","ENkyvsBJ","u40","u40waWdFv"]) = "u40waWdFvM"),
+
+
+
+    ("5.0 Empty List", longest_capitalized [] = ""),
+    ("5.10 One element List: Empty String", longest_capitalized [""] = ""),
+    ("5.11 One element List: one word", longest_capitalized ["test"] = ""),
+    ("5.12 One element List: one word", longest_capitalized ["Test"] = "Test"),
+    
+    ("5.20 Two element List: Empty String", longest_capitalized ["",""] = ""),
+    ("5.21 Two element List: Empty String + one word", longest_capitalized ["","test"] = ""),
+    ("5.22 Two element List: One word + Empty String", longest_capitalized ["test",""] = ""),
+    ("5.23 Two element List: 2 Words: Longest first", longest_capitalized ["testTest","teSt"] = ""),
+    ("5.24 Two element List: 2 Words: Shortest first", longest_capitalized ["test","testTest"] = ""),
+    ("5.25 Two element List: 2 Words: Equal Length", longest_capitalized ["testTest1","testTest2"] = ""),
+    ("5.26 Two element List: Empty String + one word", longest_capitalized ["","Test"] = "Test"),
+    ("5.27 Two element List: One word + Empty String", longest_capitalized ["Test",""] = "Test"),
+    ("5.28 Two element List: 2 Words: Longest first", longest_capitalized ["testTest","TeSt"] = "TeSt"),
+    ("5.29a Two element List: 2 Words: Shortest first", longest_capitalized ["Test","testTest"] = "Test"),
+    ("5.29b Two element List: 2 Words: Equal Length", longest_capitalized ["TestTest1","TestTest2"] = "TestTest1"),
+    
+    ("5.30 Three element List: 2*Empty String + Word at end", longest_capitalized ["","","Test"] = "Test"),
+    ("5.31 Three element List: 2*Empty String + Word at fron", longest_capitalized ["Test","",""] = "Test"),
+    ("5.32 Three element List: 2*Empty String + Word in middle", longest_capitalized ["","Test",""] = "Test"),
+    ("5.33 Three element List: 2*Short Word + Word at end", longest_capitalized ["est","sts","Test"] = "Test"),
+    ("5.34 Three element List: 2*Short Word + Word at fron", longest_capitalized ["Test","est","ste"] = "Test"),
+    ("5.35 Three element List: 2*Short Word + Word in middle", longest_capitalized ["ste","Test","est"] = "Test"),
+    ("5.36 Three element List: 2*Equal Long Word + Word in middle", longest_capitalized ["TestTest1","Test","testTest2"] = "TestTest1"),
+    ("5.37 Three element List: 2*Equal Long Word + Word in middle", longest_capitalized ["testTest1","Test","TestTest2"] = "TestTest2"),
+    ("5.38 Three element List: 2*Equal Long Word + Word in middle", longest_capitalized ["TestTest1","Test","TestTest2"] = "TestTest1"),
+    
+    ("5.40 Plenty element List: ALL equal length", longest_capitalized ["Ss6CmxYH9KAr","Ssu40waWdFvM","Ss6CmxYH9KAr","SsDW0wQKwWu7","SsASt81VnTZY","SsENkyvsBJf6","SsfPvrv723iB","Ssu40waWdFvM","Ssb9lgY0DxVo","Ssb9lgY0DxVo"] = "Ss6CmxYH9KAr"),
+    ("5.41 Plenty element List: ALL Different Length. Big To Small", longest_capitalized ["Cu40waWdFvM","CfPvrv723i","CfPvrv723","CfPvrv72","Cb9lgY0","CDKoLm","CDW0w","Cb9l","CDW","C1"] = "Cu40waWdFvM"),
+    ("5.42 Plenty element List: All Different Length. Small To Big", longest_capitalized ["SE","S1bX","Su40","SfPvr","SDKoLm","Sb9lgY0","SfPvrv72","SENkyvsBJ","Su40waWdFv","Su40waWdFvM"] = "Su40waWdFvM"),
+    ("5.43 Plenty element List: All Different Length. Random", longest_capitalized ["SE","SDKoLm","Sb9lgY0","S1bX","SfPvr","Su40waWdFvM","SfPvrv72","SENkyvsBJ","Su40","Su40waWdFv"] = "Su40waWdFvM")
+
+
 ];
 
 print "\n------------------------------------------------\n";
