@@ -41,11 +41,10 @@ fun only_capitals(ls) = List.filter (fn(x) => case size x of
 				    
 fun longest_string1(ls) = foldl(fn(x,y) => if size x > size y then x else y) "" ls
 fun longest_string2(ls) = foldl(fn(x,y) => if size x >= size y then x else y) "" ls
-(*
-fun longest_string_helper f x y ls = foldl f(x,y) "" ls
-val longest_string3 = longest_string_helper(fn(x,y) => if size x > size y then x else y)
-val longest_string4 = longest_string_helper(fn(x,y) => if size x >= size y then x else y)
-*)
+
+fun longest_string_helper f ls = List.foldl(fn(x,acc) => if f(size x, size acc) then x else acc) "" ls
+val longest_string3 = longest_string_helper (fn(x,y) => x > y)
+val longest_string4 = longest_string_helper (fn(x,y) => x >= y)
 
 val longest_capitalized = longest_string1 o only_capitals
 
@@ -85,7 +84,7 @@ In essence, the function g computes the given pattern p according to the criteri
 fun count_wildcards p = g (fn(_) => 1) (fn(_) => 0) p
 			
 fun count_wild_and_variable_lengths p = g (fn(_) => 1) (fn(s) => String.size(s)) p
-fun count_some_var s p = g (fn(_) => 0) (fn(v) => if v = s then 1 else 0) p
+fun count_some_var (s,p) = g (fn(_) => 0) (fn(v) => if v = s then 1 else 0) p
 			   
 fun check_pat p =
   let fun extract_Var p =
