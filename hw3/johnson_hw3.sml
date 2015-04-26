@@ -73,15 +73,16 @@ fun count_wild_and_variable_lengths p = g (fn(_) => 1) (fn(s) => String.size(s))
 fun count_some_var s p = g (fn(_) => 0) (fn(v) => if v = s then 1 else 0) p
 			   
 fun check_pat p =
-  let fun helper1 p =
+  let fun extract_Var p =
 	case p of
-	    Variable s => [Variable s]
-	  | TupleP ls => List.filter(fn(p) => case (helper1 p) of
-						  [s] => true
-						| _ => false) ls
-	  | ConstructorP(_,p) => helper1 p
+	    Variable s => [s]
+	  | TupleP ls => List.foldl(fn(p,acc) => acc@(extract_Var p)) [] ls
+	  | ConstructorP(_,p) => extract_Var p
 	  | _ => []
-  in List.map(fn(Variable(s)) => s) (helper1 p)
-  end;
-
-check_pat (ConstructorP("sdfs",TupleP([Variable("Test"),Variable("b"),ConstP(4),TupleP[Variable("c"),ConstructorP("sds",UnitP)],ConstructorP("dfg",TupleP[Variable("d"),Variable("e"),ConstP(4)])])));
+      fun no_duplicates ls =
+	case ls of
+	    [] => false
+	  | x::[] => true
+	  | x::xs' => if (List.exists (fn(y) => y = x) (xs')) then false else no_duplicates(xs')
+  in no_duplicates(extract_Var p)
+  end

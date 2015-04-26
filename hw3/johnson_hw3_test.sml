@@ -170,7 +170,22 @@ val tests = [
     ("9d.0 ", count_some_var ("") (TupleP[Wildcard,Variable("test"),Variable(""),Variable("dates"),ConstP(2),Variable("Wert")]) = 1),
     ("9d.0 ", count_some_var ("test") (TupleP[Wildcard,Variable("test"),Variable(""),Variable("dates"),ConstP(2),Variable("Wert")]) = 1),
     ("9d.0 ", count_some_var ("Wert") (TupleP[Wildcard,Variable("test"),Variable(""),Variable("dates"),ConstP(2),Variable("Wert")]) = 1),
-    ("9d.0 ", count_some_var ("wert") (TupleP[Wildcard,Variable("test"),Variable("wert"),Variable("dates"),ConstP(2),Variable("wert"),Wildcard,ConstructorP("wert",Wildcard),ConstructorP("wert",Variable("wert")),ConstructorP("test",Variable("wert"))]) = 4)
+    ("9d.0 ", count_some_var ("wert") (TupleP[Wildcard,Variable("test"),Variable("wert"),Variable("dates"),ConstP(2),Variable("wert"),Wildcard,ConstructorP("wert",Wildcard),ConstructorP("wert",Variable("wert")),ConstructorP("test",Variable("wert"))]) = 4),
+
+    ("10.0 ", check_pat(Wildcard) = false),
+    ("10.0 ", check_pat(Variable("unique")) = true),
+    ("10.0 ", check_pat(ConstP(3)) = false),
+    ("10.0 ", check_pat(UnitP) = false),
+    ("10.0 ", check_pat(TupleP[]) = false),
+    ("10.0 ", check_pat(TupleP[Variable("unique"),Wildcard]) = true),
+    ("10.0 ", check_pat(TupleP([Wildcard,UnitP])) = false),
+    ("10.0 ", check_pat(TupleP([Wildcard,Wildcard,UnitP,Wildcard,Variable("Wildcard"),Wildcard,Wildcard,ConstP(2)])) = true),
+    ("10.0 ", check_pat(ConstructorP("test",ConstructorP("test2",TupleP[Wildcard,Wildcard,UnitP,Wildcard,Variable("Wildcard"),Wildcard,Wildcard,ConstP(2)]))) = true),
+    ("10.0 ", check_pat(TupleP([Variable("Test1"),Variable("Test2")])) = true),
+    ("10.0 ", check_pat(TupleP([Variable("Test1"),Wildcard,Variable("Test2")])) = true),
+    ("10.0 ", check_pat(TupleP([Variable("Test1"),ConstructorP("Wildcard",Wildcard),Variable("Test2")])) = true),
+    ("10.0 ", check_pat(ConstructorP("Test",TupleP([Variable("duplicate"),TupleP([ConstructorP("test2",Variable("duplicate")),Variable("unique"),Variable("qwerty")])]))) = false),
+    ("10.0 ", check_pat(ConstructorP("sdfs",TupleP([Variable("A"),Variable("B"),ConstP(4),TupleP[Variable("C"),ConstructorP("sds",UnitP)],ConstructorP("dfg",TupleP[Variable("D"),Variable("E"),ConstP(4)])]))) = true)    
 ];
 
 print "\n------------------------------------------------\n";
@@ -186,5 +201,7 @@ fun all_tests(tests) =
 
 case all_tests(tests) of
     true => print "--------------EVERY TESTS PASSED-------------\n"
-  | false => print "--------------SOMETHING IS WRONG-------------------------\n"
+  | false => print "--------------SOMETHING IS WRONG-------------------------\n";
+
+check_pat (ConstructorP("sdfs",TupleP([Variable("A"),Variable("B"),ConstP(4),TupleP[Variable("C"),ConstructorP("sds",UnitP)],ConstructorP("dfg",TupleP[Variable("D"),Variable("E"),ConstP(4)])])));
 
