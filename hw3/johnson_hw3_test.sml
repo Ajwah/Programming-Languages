@@ -107,9 +107,47 @@ val tests = [
 
     ("6.10 Empty String", rev_string("") = ""),
     ("6.11 one letter", rev_string("t") = "t"),
-    ("6.12 one word", rev_string("Test") = "tseT")
+    ("6.12 one word", rev_string("Test") = "tseT"),
 
+    ("9b.0 Wildcard", count_wildcards(Wildcard) = 1),
+    ("9b.1 Variable x", count_wildcards(Variable("test")) = 0),
+    ("9b.2 UnitP", count_wildcards(UnitP) = 0),
+    ("9b.3 ConstP(3)", count_wildcards(ConstP(3)) = 0),
+    ("9b.40 TupleP([])", count_wildcards(TupleP[]) = 0),
+    ("9b.41 TupleP([Wildcard])", count_wildcards(TupleP([Wildcard])) = 1),
+    ("9b.42 TupleP([Variable x])", count_wildcards(TupleP([Variable("Wildcard")])) = 0),
+    ("9b.43 TupleP([UnitP])", count_wildcards(TupleP([UnitP])) = 0),
+    ("9b.44 TupleP([ConstP(5)])", count_wildcards(TupleP([ConstP(5)])) = 0),
+    ("9b.45 TupleP([Wildcard,..])", count_wildcards(TupleP([Wildcard,Wildcard,UnitP,Wildcard,Variable("Wildcard"),Wildcard,Wildcard,ConstP(2)])) = 5),
+   
+    ("9b.500 ConstructorP(,Wildcard)", count_wildcards(ConstructorP("test",Wildcard)) = 1),
+    ("9b.501 ConstructorP(,Variable)", count_wildcards(ConstructorP("test",Variable("Wildcard"))) = 0),
+    ("9b.502 ConstructorP(,UnitP)", count_wildcards(ConstructorP("test",UnitP)) = 0),
+    ("9b.503 ConstructorP(,ConstP)", count_wildcards(ConstructorP("test",ConstP(4))) = 0),
+    ("9b.504 ConstructorP(,TupleP[])", count_wildcards(ConstructorP("test",TupleP[])) = 0),
+    ("9b.505 ConstructorP(,TupleP[Wildcard)", count_wildcards(ConstructorP("test",TupleP[Wildcard])) = 1),
+    ("9b.506 ConstructorP(,TupleP[Variable)", count_wildcards(ConstructorP("test",TupleP[Variable("Wildcard")])) = 0),
+    ("9b.507 ConstructorP(,TupleP[UnitP)", count_wildcards(ConstructorP("test",TupleP[UnitP])) = 0),
+    ("9b.508 ConstructorP(,TupleP[ConstP)", count_wildcards(ConstructorP("test",TupleP[ConstP(5)])) = 0),
+    ("9b.509 ConstructorP(,TupleP[....)", count_wildcards(ConstructorP("test",TupleP[Wildcard,Wildcard,UnitP,Wildcard,Variable("Wildcard"),Wildcard,Wildcard,ConstP(2)])) = 5),
+    ("9b.510 ConstructorP(,Constructor(,Wildcard)", count_wildcards(ConstructorP("test",ConstructorP("test2",Wildcard))) = 1),
+    ("9b.511 ConstructorP(,Constructor(,Variable)", count_wildcards(ConstructorP("test",ConstructorP("test2",Variable("Wildcard")))) = 0),
+    ("9b.512 ConstructorP(,Constructor(,UnitP)", count_wildcards(ConstructorP("test",ConstructorP("test2",UnitP))) = 0),
+    ("9b.513 ConstructorP(,Constructor(,ConstP)", count_wildcards(ConstructorP("test",ConstructorP("test2",ConstP(4)))) = 0),
+    ("9b.514 ConstructorP(,Constructor(,TupleP)", count_wildcards(ConstructorP("test",ConstructorP("test2",TupleP[]))) = 0),
+    ("9b.515 ConstructorP(,Constructor(,TupleP[Wildcard)", count_wildcards(ConstructorP("test",ConstructorP("test2",TupleP[Wildcard]))) = 1),
+    ("9b.516 ConstructorP(,Constructor(,TupleP[Variable)", count_wildcards(ConstructorP("test",ConstructorP("test2",TupleP[Variable("Wildcard")]))) = 0),
+    ("9b.517 ConstructorP(,Constructor(,TupleP[UnitP)", count_wildcards(ConstructorP("test",ConstructorP("test2",TupleP[UnitP]))) = 0),
+    ("9b.518 ConstructorP(,Constructor(,TupleP[ConstP)", count_wildcards(ConstructorP("test",ConstructorP("test2",TupleP[ConstP(5)]))) = 0),
+    ("9b.519 ConstructorP(,Constructor(,TupleP[......)", count_wildcards(ConstructorP("test",ConstructorP("test2",TupleP[Wildcard,Wildcard,UnitP,Wildcard,Variable("Wildcard"),Wildcard,Wildcard,ConstP(2)]))) = 5),
 
+    ("9b.520 (TupleP[ConstructorP(,WILDCARD)", count_wildcards(TupleP[ConstructorP("test",ConstructorP("test2",Wildcard)),Wildcard]) = 2),
+    ("9b.521 (TupleP[ConstructorP(,Variable)", count_wildcards(TupleP[ConstructorP("test",ConstructorP("test2",Variable("Wildcard"))),Wildcard]) = 1),
+    ("9b.522 (TupleP[ConstructorP(,UnitP)", count_wildcards(TupleP[ConstructorP("test",ConstructorP("test2",UnitP)),UnitP,Wildcard]) = 1),
+    ("9b.523 (TupleP[ConstructorP(,ConstP)", count_wildcards(TupleP[ConstructorP("test",ConstructorP("test2",ConstP(4))),ConstP(3),Wildcard]) = 1),
+    ("9b.524 (TupleP[ConstructorP(,TupleP)", count_wildcards(TupleP[ConstructorP("test",ConstructorP("test2",TupleP[])),TupleP[],Wildcard]) = 1),
+    ("9b.525 (TupleP[ConstructorP(,Constructor)", count_wildcards(TupleP[ConstructorP("test",ConstructorP("test2",TupleP[Wildcard])),ConstructorP("test3",Wildcard)]) = 2)
+    
 ];
 
 print "\n------------------------------------------------\n";
@@ -124,6 +162,6 @@ fun all_tests(tests) =
 	end;
 
 case all_tests(tests) of
-	true => print "--------------EVERY TESTS PASSED-------------\n"
+    true => print "--------------EVERY TESTS PASSED-------------\n"
   | false => print "--------------SOMETHING IS WRONG-------------------------\n"
 

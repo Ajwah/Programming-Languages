@@ -62,3 +62,10 @@ fun all_answers
 *)
 					      
 					 
+(*
+9.a The function g takes three parameters in curried format, the first two are functions and the last one is a variable binding of type pattern. The function g eventually evaluates to type int.
+In essence, the function g computes the given pattern p according to the criteria of the two functions evaluating to a single value of type int.
+*)
+
+fun count_wildcards p = g (fn(_) => 1) (fn(_) => 0) p
+			
