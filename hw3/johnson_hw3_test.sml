@@ -160,7 +160,17 @@ val tests = [
     ("9c.45 ", count_wild_and_variable_lengths(TupleP([ConstructorP("test",ConstructorP("test2",TupleP[Wildcard])),ConstructorP("test3",Wildcard)])) = 2),
     ("9c.46 ", count_wild_and_variable_lengths(TupleP([Variable("Test1"),Variable("Test2")])) = 10),
     ("9c.47 ", count_wild_and_variable_lengths(TupleP([Variable("Test1"),Wildcard,Variable("Test2")])) = 11),
-    ("9c.48 ", count_wild_and_variable_lengths(TupleP([Variable("Test1"),ConstructorP("Wildcard",Wildcard),Variable("Test2")])) = 11)
+    ("9c.48 ", count_wild_and_variable_lengths(TupleP([Variable("Test1"),ConstructorP("Wildcard",Wildcard),Variable("Test2")])) = 11),
+
+    ("9d.0 ", count_some_var ("test") (Variable("test")) = 1),
+    ("9d.0 ", count_some_var ("dates") (Wildcard) = 0),
+    ("9d.0 ", count_some_var ("dates") (ConstP(3)) = 0),
+    ("9d.0 ", count_some_var ("setad") (UnitP) = 0),
+    ("9d.0 ", count_some_var ("wert") (TupleP[Wildcard,Variable("test"),Variable(""),Variable("dates"),ConstP(2),Variable("Wert")]) = 0),
+    ("9d.0 ", count_some_var ("") (TupleP[Wildcard,Variable("test"),Variable(""),Variable("dates"),ConstP(2),Variable("Wert")]) = 1),
+    ("9d.0 ", count_some_var ("test") (TupleP[Wildcard,Variable("test"),Variable(""),Variable("dates"),ConstP(2),Variable("Wert")]) = 1),
+    ("9d.0 ", count_some_var ("Wert") (TupleP[Wildcard,Variable("test"),Variable(""),Variable("dates"),ConstP(2),Variable("Wert")]) = 1),
+    ("9d.0 ", count_some_var ("wert") (TupleP[Wildcard,Variable("test"),Variable("wert"),Variable("dates"),ConstP(2),Variable("wert"),Wildcard,ConstructorP("wert",Wildcard),ConstructorP("wert",Variable("wert")),ConstructorP("test",Variable("wert"))]) = 4)
 ];
 
 print "\n------------------------------------------------\n";
