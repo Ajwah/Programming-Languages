@@ -42,7 +42,7 @@ fun only_capitals(ls) = List.filter (fn(x) => case size x of
 fun longest_string1(ls) = foldl(fn(x,y) => if size x > size y then x else y) "" ls
 fun longest_string2(ls) = foldl(fn(x,y) => if size x >= size y then x else y) "" ls
 (*
-fun longest_string_helper f(x,y) ls = foldl f(x,y) "" ls
+fun longest_string_helper f x y ls = foldl f(x,y) "" ls
 val longest_string3 = longest_string_helper(fn(x,y) => if size x > size y then x else y)
 val longest_string4 = longest_string_helper(fn(x,y) => if size x >= size y then x else y)
 *)
@@ -56,4 +56,9 @@ will not work
 http://stackoverflow.com/questions/12729640/why-is-there-type-mismatch-of-operator-and-operand
 *)
 fun rev_string(s) = (implode o rev o explode) s
-					    
+(*					    
+fun first_answer f ls = foldl(f(x))
+fun all_answers
+*)
+					      
+					 
