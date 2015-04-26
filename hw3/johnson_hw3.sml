@@ -56,10 +56,25 @@ will not work
 http://stackoverflow.com/questions/12729640/why-is-there-type-mismatch-of-operator-and-operand
 *)
 fun rev_string(s) = (implode o rev o explode) s
-(*					    
-fun first_answer f ls = foldl(f(x))
-fun all_answers
-*)
+					      
+					    
+fun first_answer f ls =
+  case ls of
+      [] => raise NoAnswer
+    | x::xs' => case f(x) of
+		    SOME v => v
+		  | NONE => first_answer f xs'
+					 
+fun all_answers f ls =
+  let fun accumulator(ls,acc) =
+	case ls of
+	    [] => SOME acc
+	  | x::xs' => case f(x) of
+			  SOME v => accumulator(xs',acc@[v])
+			| NONE => NONE
+  in accumulator(ls,[])
+  end
+
 					      
 					 
 (*
