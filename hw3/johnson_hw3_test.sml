@@ -146,8 +146,21 @@ val tests = [
     ("9b.522 (TupleP[ConstructorP(,UnitP)", count_wildcards(TupleP[ConstructorP("test",ConstructorP("test2",UnitP)),UnitP,Wildcard]) = 1),
     ("9b.523 (TupleP[ConstructorP(,ConstP)", count_wildcards(TupleP[ConstructorP("test",ConstructorP("test2",ConstP(4))),ConstP(3),Wildcard]) = 1),
     ("9b.524 (TupleP[ConstructorP(,TupleP)", count_wildcards(TupleP[ConstructorP("test",ConstructorP("test2",TupleP[])),TupleP[],Wildcard]) = 1),
-    ("9b.525 (TupleP[ConstructorP(,Constructor)", count_wildcards(TupleP[ConstructorP("test",ConstructorP("test2",TupleP[Wildcard])),ConstructorP("test3",Wildcard)]) = 2)
-    
+    ("9b.525 (TupleP[ConstructorP(,Constructor)", count_wildcards(TupleP[ConstructorP("test",ConstructorP("test2",TupleP[Wildcard])),ConstructorP("test3",Wildcard)]) = 2),
+
+    ("9c.0 ", count_wild_and_variable_lengths(Wildcard) = 1),
+    ("9c.1 ", count_wild_and_variable_lengths(Variable("Test")) = 4),
+    ("9c.2 ", count_wild_and_variable_lengths(UnitP) = 0),
+    ("9c.3 ", count_wild_and_variable_lengths(ConstP(2)) = 0),
+    ("9c.40 ", count_wild_and_variable_lengths(TupleP([])) = 0),
+    ("9c.41 ", count_wild_and_variable_lengths(TupleP([Variable("Test"),Wildcard])) = 5),
+    ("9c.42 ", count_wild_and_variable_lengths(TupleP([Wildcard,UnitP])) = 1),
+    ("9c.43 ", count_wild_and_variable_lengths(TupleP([Wildcard,Wildcard,UnitP,Wildcard,Variable("Wildcard"),Wildcard,Wildcard,ConstP(2)])) = 13),
+    ("9c.44 ", count_wild_and_variable_lengths(ConstructorP("test",ConstructorP("test2",TupleP[Wildcard,Wildcard,UnitP,Wildcard,Variable("Wildcard"),Wildcard,Wildcard,ConstP(2)]))) = 13),
+    ("9c.45 ", count_wild_and_variable_lengths(TupleP([ConstructorP("test",ConstructorP("test2",TupleP[Wildcard])),ConstructorP("test3",Wildcard)])) = 2),
+    ("9c.46 ", count_wild_and_variable_lengths(TupleP([Variable("Test1"),Variable("Test2")])) = 10),
+    ("9c.47 ", count_wild_and_variable_lengths(TupleP([Variable("Test1"),Wildcard,Variable("Test2")])) = 11),
+    ("9c.48 ", count_wild_and_variable_lengths(TupleP([Variable("Test1"),ConstructorP("Wildcard",Wildcard),Variable("Test2")])) = 11)
 ];
 
 print "\n------------------------------------------------\n";

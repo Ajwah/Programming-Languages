@@ -69,3 +69,4 @@ In essence, the function g computes the given pattern p according to the criteri
 
 fun count_wildcards p = g (fn(_) => 1) (fn(_) => 0) p
 			
+fun count_wild_and_variable_lengths p = g (fn(_) => 1) (fn(s) => String.size(s)) p
