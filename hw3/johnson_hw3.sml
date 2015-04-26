@@ -72,3 +72,16 @@ fun count_wildcards p = g (fn(_) => 1) (fn(_) => 0) p
 fun count_wild_and_variable_lengths p = g (fn(_) => 1) (fn(s) => String.size(s)) p
 fun count_some_var s p = g (fn(_) => 0) (fn(v) => if v = s then 1 else 0) p
 			   
+fun check_pat p =
+  let fun helper1 p =
+	case p of
+	    Variable s => [Variable s]
+	  | TupleP ls => List.filter(fn(p) => case (helper1 p) of
+						  [s] => true
+						| _ => false) ls
+	  | ConstructorP(_,p) => helper1 p
+	  | _ => []
+  in List.map(fn(Variable(s)) => s) (helper1 p)
+  end;
+
+check_pat (ConstructorP("sdfs",TupleP([Variable("Test"),Variable("b"),ConstP(4),TupleP[Variable("c"),ConstructorP("sds",UnitP)],ConstructorP("dfg",TupleP[Variable("d"),Variable("e"),ConstP(4)])])));
