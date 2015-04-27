@@ -69,7 +69,7 @@ fun all_answers f ls =
 	case ls of
 	    [] => SOME acc
 	  | x::xs' => case f(x) of
-			  SOME v => accumulator(xs',acc@[v])
+			  SOME v => accumulator(xs',acc@v)
 			| NONE => NONE
   in accumulator(ls,[])
   end
@@ -100,3 +100,20 @@ fun check_pat p =
 	  | x::xs' => if (List.exists (fn(y) => y = x) (xs')) then false else no_duplicates(xs')
   in no_duplicates(extract_Var p)
   end
+
+fun match(v,p) =
+  case(v,p) of
+      (_,Wildcard) => SOME []
+    | (v,Variable s) => SOME [(s,v)]
+    | (Unit,UnitP) => SOME []
+    | (Const _, ConstP _) => SOME []
+    | (Tuple(vs), TupleP(ps)) => if List.length vs = List.length ps
+			       then all_answers (match) (ListPair.zip(vs,ps))
+			       else NONE
+    | (Constructor(s2,v),ConstructorP(s1,p)) => if s1 = s2
+						then match(v,p)
+						else NONE
+    | _ => NONE
+								
+fun first_match v lp = SOME (first_answer (match) (List.map(fn(x) => (v,x)) lp))
+			handle NoAnswer => NONE
