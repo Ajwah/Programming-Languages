@@ -27,4 +27,14 @@ fun without_bone(h,b) =
 			    else helper(xs',(s1,s2)::acc)
   in helper(h,[])
   end
-	     
+
+fun layout_summary(l) =
+  let fun helper(l,pl) =
+	case l of
+	    (_,s2)::[] => SOME (pl,s2)
+	  | _::xs' => helper(xs',pl)
+  in case l of
+	 [] => NONE
+       | x::[] => SOME x
+       | (s1,_)::xs' => helper(xs',s1)
+  end
