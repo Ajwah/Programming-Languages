@@ -38,3 +38,20 @@ fun layout_summary(l) =
        | x::[] => SOME x
        | (s1,_)::xs' => helper(xs',s1)
   end
+
+fun best_move(l,h) =
+  case (l,h) of
+      ([],[]) => PassDraw
+    | ([],b::bs') => PlayFirst b
+    | (l,h) => let val layout = layout_summary(l)
+		   val left = #1 layout
+		   val right = #2 layout
+	       in case(find_playable(h,left),find_playable(h,right) of
+			  (NONE,NONE) => PassDraw
+			| (SOME b, _) => PlayLeft b
+			| (_, SOME b) => PlayRight b
+						   
+		       end;
+
+		       
+				  

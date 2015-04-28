@@ -3,6 +3,7 @@ use "johnson_hw.sml";
 val f1 = find_playable
 val f2 = without_bone
 val f3 = layout_summary
+val f4 = best_move
 	     
 (*Unit tests are of format string*bool where bool is represented by evaluation of a function to an expected value*)
 val tests = [
@@ -25,7 +26,17 @@ val tests = [
     ("3.1", f3([(1,7)]) = SOME (1,7)),
     ("3.2", f3([(1,1),(2,1)]) = SOME (1,1)),
     ("3.3", f3([(1,1),(2,1),(3,4)]) = SOME (1,4)),
-    ("3.4", f3([(5,6),(3,4),(1,2),(5,6)]) = SOME (5,6))
+    ("3.4", f3([(5,6),(3,4),(1,2),(5,6)]) = SOME (5,6)),
+
+    ("4.0", f4([],[]) = PassDraw),
+    ("4.1", f4([],[(1,2)]) = PlayFirst (1,2)),
+    ("4.2", f4([(1,2)],[(1,2)]) = PlayLeft (1,2)),
+    ("4.3", f4([(2,1)],[(1,2)]) = PlayLeft (1,2)),
+    ("4.4", f4([(3,4),(4,6)],[(3,2)]) = PlayLeft (3,2)),
+    ("4.5", f4([(3,4),(4,6)],[(1,3)]) = PlayLeft (1,3)),
+    ("4.6", f4([(3,4),(4,6)],[(3,6)]) = PlayRight (3,6)),
+    ("4.7", f4([(3,4),(4,6)],[(6,3)]) = PlayRight (6,3)),
+    ("4.8", f2([(5,6),(3,4),(1,2),(3,4)],[(7,7)]) = PassDraw)
     
 ];
 
