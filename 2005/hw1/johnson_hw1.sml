@@ -52,3 +52,15 @@ fun make_line_between(a,b) =
   in helper(a)
   end
       
+fun legal_order_r(blist) =
+  let fun helper(ls) =
+	case ls of
+	    x::[] => true
+	  | (_,s2)::(s1',s2')::xs' => if s2 = s1'
+				      then helper((s1',s2')::xs')
+				      else s2 = s2' andalso helper((s2',s1')::xs')
+  in case blist of
+	 [] => false
+       | x::[] => true
+       | (s1,s2)::xs' => helper((s1,s2)::xs') orelse helper((s2,s1)::xs')
+  end
