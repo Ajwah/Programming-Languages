@@ -44,3 +44,11 @@ fun legal_order(blist) =
        | _ => helper(blist)
   end
       
+fun make_line_between(a,b) =
+  let fun helper(c) =
+	if c < b
+	then (c,c+1)::helper(c+1)
+	else []
+  in helper(a)
+  end
+      
