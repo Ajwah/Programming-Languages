@@ -34,3 +34,13 @@ fun all_same_suit(blist) =
        | (s1,s2)::xs' => helper(s1, xs') orelse helper(s2, xs')
   end
       
+fun legal_order(blist) =
+  let fun helper(ls) =
+	case ls of
+	    x::[] => true
+	  | (_,s2)::(s1',s2')::xs' => s2 = s1' andalso helper((s1',s2')::xs')
+  in case blist of
+	 [] => false
+       | _ => helper(blist)
+  end
+      
