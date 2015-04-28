@@ -23,7 +23,7 @@ fun without_bone(h,b) =
 	case h of
 	    [] => acc
 	  | (s1,s2)::xs' => if (s1,s2) = b orelse (s2,s1) = b
-			    then acc @ xs'
+			    then List.concat(acc::xs'::[])
 			    else helper(xs',(s1,s2)::acc)
   in helper(h,[])
   end
