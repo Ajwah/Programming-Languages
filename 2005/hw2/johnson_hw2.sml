@@ -18,5 +18,13 @@ fun find_playable(h,s) =
 		      then SOME (s1,s2)
 		      else find_playable(xs',s)
 					
-	     
+fun without_bone(h,b) =
+  let fun helper(h,acc) =
+	case h of
+	    [] => acc
+	  | (s1,s2)::xs' => if (s1,s2) = b orelse (s2,s1) = b
+			    then acc @ xs'
+			    else helper(xs',(s1,s2)::acc)
+  in helper(h,[])
+  end
 	     
