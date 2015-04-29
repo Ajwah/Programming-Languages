@@ -1,5 +1,5 @@
-use "johnson_hw.sml";
-
+use "johnson_hw2.sml";
+val name_hw = "2005 - Assignment Two"
 val f1 = find_playable
 val f2 = without_bone
 val f3 = layout_summary
@@ -34,13 +34,13 @@ val tests = [
     ("4.3", f4([(2,1)],[(1,2)]) = PlayLeft (1,2)),
     ("4.4", f4([(3,4),(4,6)],[(3,2)]) = PlayLeft (3,2)),
     ("4.5", f4([(3,4),(4,6)],[(1,3)]) = PlayLeft (1,3)),
-    ("4.6", f4([(3,4),(4,6)],[(3,6)]) = PlayRight (3,6)),
-    ("4.7", f4([(3,4),(4,6)],[(6,3)]) = PlayRight (6,3)),
-    ("4.8", f2([(5,6),(3,4),(1,2),(3,4)],[(7,7)]) = PassDraw)
+    ("4.6", f4([(3,4),(4,6)],[(2,6)]) = PlayRight (2,6)),
+    ("4.7", f4([(3,4),(4,6)],[(6,5)]) = PlayRight (6,5)),
+    ("4.8", f4([(5,6),(3,4),(1,2),(3,4)],[(7,7)]) = PassDraw)
     
 ];
 
-print "\n------------------------------------------------\n";
+print ("\n----------------------"^name_hw^"--------------------------\n");
 fun all_tests(tests) =
 	let fun helper(tests: (string*bool) list, all_passed) = 
 		case tests of
