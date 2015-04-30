@@ -50,3 +50,6 @@ fun lineprog_func prog pair =
 
 val fl1 =  (List.foldl (fn(f,acc) => f acc)) o (List.map lineop_func p);
 *)
+
+
+								     

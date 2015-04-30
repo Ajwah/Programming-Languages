@@ -2,6 +2,7 @@ use "johnson_hw3.sml";
 val name_hw = "2005 - Assignment Three"
 
 val f1 = lineop_func
+val f2 = lineprog_func
 (*Unit tests are of format string*bool where bool is represented by evaluation of a function to an expected value*)
 val tests = [
     ("1.00", f1 PushRight ([],[]) <> ([],[]) handle Empty => true),
@@ -35,7 +36,10 @@ val tests = [
     ("1.47", f1 (ApplyLeft(fn(x,y) => (y,x))) ([(2,3),(4,5)],[(1,1)]) = ([(3,2),(4,5)],[(1,1)])),
     ("1.48", f1 (ApplyRight(fn(x,y) => (y,x*4))) ([(2,2)],[(1,2),(3,4)]) = ([(2,2)],[(2,4),(3,4)])),
     ("1.49", f1 (ApplyLeft(fn(x,y) => (y,x*4))) ([(2,3),(4,5)],[(1,1)]) = ([(3,8),(4,5)],[(1,1)])),
-    ("2.00", f2 [PushRight]
+    ("2.00", f2 [PushRight] ([(1,1)],[]) = ([],[(1,1)])),
+    ("2.01", f2 [PushRight,PushLeft,PushRight] ([(1,1)],[]) = ([],[(1,1)])),
+    ("2.02", f2 [SwapFirst,PushRight] ([(1,1)],[(2,2)]) = ([],[(2,2),(1,1)])),
+    ("2.03", f2 [PushRight,PushRight,SwapFirst, ApplyRight(fn(x,y)=>(y,x)), ApplyLeft(fn(x,y)=>(2*y,3*x))] ([(1,2),(6,7),(3,4),(8,9)],[(3,4),(6,7),(1,2),(8,9)]) = ([(14,18),(8,9)],[(4,3),(1,2),(3,4),(6,7),(1,2),(8,9)]))
 	
 ];
 
