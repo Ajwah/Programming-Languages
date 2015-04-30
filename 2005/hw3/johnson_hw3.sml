@@ -40,3 +40,13 @@ fun lineop_func lop bpair =
 	 | (ApplyLeft f, y::ys',right)  => (f(y)::ys',right)
   in helper bpair
   end
+
+fun lineprog_func prog pair = List.foldl (fn(f,acc) => f acc) pair (List.map lineop_func prog);
+      (*
+fun lineprog_func prog pair =
+  case prog of
+      x::[] => pair
+    | x::xs' => lineprog_func xs' (lineop_func x pair)
+
+val fl1 =  (List.foldl (fn(f,acc) => f acc)) o (List.map lineop_func p);
+*)
