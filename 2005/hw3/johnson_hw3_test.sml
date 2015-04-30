@@ -3,6 +3,18 @@ val name_hw = "2005 - Assignment Three"
 
 val f1 = lineop_func
 val f2 = lineprog_func
+val f3 = pushn_right_safe
+
+fun compare lop1 lop2 =
+  case (lop1,lop2) of
+      (PushRight,PushRight) => true
+    | (PushLeft,PushLeft) => true
+    | (SwapFirst,SwapFirst) => true
+    | (ApplyRight _, ApplyRight _) => true
+    | (ApplyLeft _, ApplyLeft _) => true
+    | _ => false
+fun comparelists(l1, l2) = List.foldl(fn((x,y),acc) => compare x y) true (ListPair.zip(l1,l2))
+				   
 (*Unit tests are of format string*bool where bool is represented by evaluation of a function to an expected value*)
 val tests = [
     ("1.00", f1 PushRight ([],[]) <> ([],[]) handle Empty => true),
@@ -39,7 +51,12 @@ val tests = [
     ("2.00", f2 [PushRight] ([(1,1)],[]) = ([],[(1,1)])),
     ("2.01", f2 [PushRight,PushLeft,PushRight] ([(1,1)],[]) = ([],[(1,1)])),
     ("2.02", f2 [SwapFirst,PushRight] ([(1,1)],[(2,2)]) = ([],[(2,2),(1,1)])),
-    ("2.03", f2 [PushRight,PushRight,SwapFirst, ApplyRight(fn(x,y)=>(y,x)), ApplyLeft(fn(x,y)=>(2*y,3*x))] ([(1,2),(6,7),(3,4),(8,9)],[(3,4),(6,7),(1,2),(8,9)]) = ([(14,18),(8,9)],[(4,3),(1,2),(3,4),(6,7),(1,2),(8,9)]))
+    ("2.03", f2 [PushRight,PushRight,SwapFirst, ApplyRight(fn(x,y)=>(y,x)), ApplyLeft(fn(x,y)=>(2*y,3*x))] ([(1,2),(6,7),(3,4),(8,9)],[(3,4),(6,7),(1,2),(8,9)]) = ([(14,18),(8,9)],[(4,3),(1,2),(3,4),(6,7),(1,2),(8,9)])),
+
+    ("3.00", comparelists(f3 0, [])),
+    ("3.01", comparelists(f3 ~1, [])),
+    ("3.02", comparelists(f3 1, [PushRight, ApplyRight(fn(x,y)=>(y,x))])),
+    ("3.03", comparelists(f3 5, [PushRight, ApplyRight(fn(x,y)=>(y,x)),PushRight, ApplyRight(fn(x,y)=>(y,x)),PushRight, ApplyRight(fn(x,y)=>(y,x)),PushRight, ApplyRight(fn(x,y)=>(y,x)),PushRight, ApplyRight(fn(x,y)=>(y,x))]))
 	
 ];
 

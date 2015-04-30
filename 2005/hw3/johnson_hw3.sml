@@ -51,5 +51,10 @@ fun lineprog_func prog pair =
 val fl1 =  (List.foldl (fn(f,acc) => f acc)) o (List.map lineop_func p);
 *)
 
-
+fun pushn_right_safe n =
+  case (n, n > ~1) of
+      (_,false) => []
+    | (0,true) => []
+    | (1,true) => [PushRight, ApplyRight(fn(x,y)=>(y,x))]
+    | (n,true) =>  PushRight::ApplyRight(fn(x,y)=>(y,x))::(pushn_right_safe (n-1))
 								     
