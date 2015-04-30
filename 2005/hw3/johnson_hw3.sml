@@ -52,9 +52,22 @@ val fl1 =  (List.foldl (fn(f,acc) => f acc)) o (List.map lineop_func p);
 *)
 
 fun pushn_right_safe n =
-  case (n, n > ~1) of
+  case (n, n > 0) of
       (_,false) => []
-    | (0,true) => []
     | (1,true) => [PushRight, ApplyRight(fn(x,y)=>(y,x))]
     | (n,true) =>  PushRight::ApplyRight(fn(x,y)=>(y,x))::(pushn_right_safe (n-1))
 								     
+fun pushn_right_block n =
+  let fun push_right m =
+	case (m, m > 0) of
+	    (_, false) => []
+	  | (m, true) => PushRight::(push_right (m-1))
+      fun swap_left m =
+	case (m, m > 0) of
+	    (_, false) => [SwapFirst]
+	  | (m, true) => SwapFirst::PushLeft::(swap_left (m-1))
+  in case (n, n < 2,n < 1) of
+	 (_, _, true) => []
+       | (1, _, false) => [PushRight]
+       | (_,false, _) => push_right(n-1)@swap_left(n-2)@pushn_right_block(n-1)
+  end
