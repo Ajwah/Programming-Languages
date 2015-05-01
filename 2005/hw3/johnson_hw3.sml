@@ -71,3 +71,15 @@ fun pushn_right_block n =
        | (1,_,false) => [PushRight]
        | (_,false,_) => push_right(n-1)@swap_left(n-2)@pushn_right_block(n-1)
   end
+
+fun lineprog_mirror prog = List.map(fn(e)=> case e of
+						PushRight => PushLeft
+					      | PushLeft => PushRight
+					      | ApplyRight f => ApplyLeft f
+					      | ApplyLeft f => ApplyRight f
+					      | _ => e) prog
+
+val pushn_left_safe = lineprog_mirror o pushn_right_safe
+val pushn_left_block = lineprog_mirror o pushn_right_block
+					     
+							 
