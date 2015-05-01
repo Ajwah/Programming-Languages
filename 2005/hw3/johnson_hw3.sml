@@ -90,3 +90,15 @@ fun lineprog_optimize prog =
     | PushLeft::PushRight::xs'' => lineprog_optimize xs''
     | SwapFirst::SwapFirst::xs'' => lineprog_optimize xs''
     | x::xs'::xs'' => x::xs'::(lineprog_optimize xs'')
+
+val bignumber = 100000.0
+val smallnumber = 1.0/bignumber
+fun derivative f x = ((f (x + smallnumber)) - (f x))/smallnumber
+
+fun def_integral (f:real->real) a b =
+  if (a + smallnumber) < b
+  then (f a) + (def_integral f (a+smallnumber) b)
+  else f a
+	 
+fun integral f = def_integral f 0.0
+			      
