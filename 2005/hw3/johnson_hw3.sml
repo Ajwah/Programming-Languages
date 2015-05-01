@@ -82,4 +82,11 @@ fun lineprog_mirror prog = List.map(fn(e)=> case e of
 val pushn_left_safe = lineprog_mirror o pushn_right_safe
 val pushn_left_block = lineprog_mirror o pushn_right_block
 					     
-							 
+fun lineprog_optimize prog =
+  case prog of
+      [] => []
+    | x::[] => [x]
+    | PushRight::PushLeft::xs'' => lineprog_optimize xs''
+    | PushLeft::PushRight::xs'' => lineprog_optimize xs''
+    | SwapFirst::SwapFirst::xs'' => lineprog_optimize xs''
+    | x::xs'::xs'' => x::xs'::(lineprog_optimize xs'')
