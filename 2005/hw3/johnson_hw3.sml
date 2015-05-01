@@ -67,7 +67,7 @@ fun pushn_right_block n =
 	    (_, false) => [SwapFirst]
 	  | (m, true) => SwapFirst::PushLeft::(swap_left (m-1))
   in case (n, n < 2,n < 1) of
-	 (_, _, true) => []
-       | (1, _, false) => [PushRight]
-       | (_,false, _) => push_right(n-1)@swap_left(n-2)@pushn_right_block(n-1)
+	 (_,_,true) => []
+       | (1,_,false) => [PushRight]
+       | (_,false,_) => push_right(n-1)@swap_left(n-2)@pushn_right_block(n-1)
   end
