@@ -1,0 +1,78 @@
+fun alist_map (f, al) = List.map f al
+fun team_names al = alist_map(fn( (k, v) => k), al)
+			     
+fun alist_reduce (f, b, nil) = b
+  | alist_reduce (f, b, (k,v)::rest) = f(k, v, alist_reduce (f, b, rest))
+fun better_record ({losses=l1,wins=w1}, {losses=l2,wins=w2}) = w1-l1 > w2-l2
+fun best_record l = alist_reduce ((fn(k,v,rest)=> if better_record(v,rest) then v else rest), {losses=0,wins=0}, l)
+
+fun all_games_back l =
+  let val no1 as {losses=l1,wins=w1} = best_record l
+  in alist_map ((fn(k, {losses=l2,wins=w2})=> (k,real((l2-l1)-(w2-w1))/2.0)), l)
+  end
+				       
+val nba_leagues = [
+    "Atlanta Hawks",
+    "Boston Celtics",
+    "Charlotte Bobcats",
+    "Chicago Bulls",
+    "Cleveland Cavaliers",
+    "Dallas Mavericks",
+    "Denver Nuggets",
+    "Detroit Pistons",
+    "Golden State Warriors",
+    "Houston Rockets",
+    "Indiana Pacers",
+    "LA Clippers",
+    "LA Lakers",
+    "Memphis Grizzlies",
+    "Miami Heat",
+    "Milwaukee Bucks",
+    "Minnesota Timberwolves",
+    "New Jersey Nets",
+    "New Orleans Hornets",
+    "New York Knicks",
+    "Oklahoma City Thunder",
+    "Orlando Magic",
+    "Philadelphia Sixers",
+    "Phoenix Suns",
+    "Portland Trail Blazers",
+    "Sacramento Kings",
+    "San Antonio Spurs",
+    "Toronto Raptors",
+    "Utah Jazz",
+    "Washington Wizards"
+]
+val control = [
+    ("Washington Wizards",{losses=0,wins=0}),
+    ("Utah Jazz",{losses=0,wins=0}),
+    ("Toronto Raptors",{losses=0,wins=0}),
+    ("San Antonio Spurs",{losses=0,wins=0}),
+    ("Sacramento Kings",{losses=0,wins=0}),
+    ("Portland Trail Blazers",{losses=0,wins=0}),
+    ("Phoenix Suns",{losses=0,wins=0}),
+    ("Philadelphia Sixers",{losses=0,wins=0}),
+    ("Orlando Magic",{losses=0,wins=0}),
+    ("Oklahoma City Thunder",{losses=0,wins=0}),
+    ("New York Knicks",{losses=0,wins=0}),
+    ("New Orleans Hornets",{losses=0,wins=0}),
+    ("New Jersey Nets",{losses=0,wins=0}),
+    ("Minnesota Timberwolves",{losses=0,wins=0}),
+    ("Milwaukee Bucks",{losses=0,wins=0}),
+    ("Miami Heat",{losses=0,wins=0}),
+    ("Memphis Grizzlies",{losses=0,wins=0}),
+    ("LA Lakers",{losses=0,wins=0}),
+    ("LA Clippers",{losses=0,wins=0}),
+    ("Indiana Pacers",{losses=0,wins=0}),
+    ("Houston Rockets",{losses=0,wins=0}),
+    ("Golden State Warriors",{losses=0,wins=0}),
+    ("Detroit Pistons",{losses=0,wins=0}),
+    ("Denver Nuggets",{losses=0,wins=0}),
+    ("Dallas Mavericks",{losses=0,wins=0}),
+    ("Cleveland Cavaliers",{losses=0,wins=0}),
+    ("Chicago Bulls",{losses=0,wins=0}),
+    ("Charlotte Bobcats",{losses=0,wins=0}),
+    ("Boston Celtics",{losses=0,wins=0}),
+    ("Atlanta Hawks",{losses=0,wins=0})
+]
+		  
