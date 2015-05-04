@@ -13,3 +13,15 @@ polynomial [~2.0, 2.0];
 polynomial [1.0, 1.0, 1.0];
 polynomial [0.0, 1.0, 2.0, 3.0];
 
+(*Rough integrals.*)
+fun roughIntegral f a b n =
+  let val width = (b-a)/n
+      fun helper c =
+	if c > b then 0.0 else (f c) + helper (c + width)
+  in (helper a)*width
+  end;
+
+roughIntegral (fn(x)=>Math.sqrt(1.0-x*x)) 0.0 1.0 4.0;
+roughIntegral (fn(x)=>Math.sqrt(1.0-x*x)) 0.0 1.0 10.0;
+roughIntegral (fn(x)=>x) 10.0 20.0 10.0;
+      
