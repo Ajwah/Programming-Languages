@@ -1,0 +1,10 @@
+use "johnson_hw5.sml";
+
+next [] <> [] handle InsufficientArguments => true;
+next [1] <> [1] handle InsufficientArguments => true;
+next [(1,0)] <> [(1,0)] handle InsufficientArguments => true;
+next [[1,0]] <> [[1,0]] handle InsufficientArguments => true;
+next [1,2] = 3;
+next [1,2,3] = 4;
+next [1,2,3,4] = 5;
+
