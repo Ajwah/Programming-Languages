@@ -20,16 +20,16 @@ fun fleet_to_grid [] = []
 fun shot_hit (sx,sy) = List.exists (fn(x,y)=> x = sx andalso y = sy)
 						     
 fun fleet_salvo_summary salvo fleet =
-  let fun salvo_hits [] _ = 0
-	| salvo_hits _ [] = 0
-	| salvo_hits (one_shot::[]) (one_ship::[]) = if (shot_hit one_shot one_ship) then 1 else 0
+  let fun {hits=h1,misses=m1} + {hits=h2,misses=m2} = {hits=(h1-(~h2)),misses=(m1-(~m2))}
+      fun salvo_hits [] _ = {hits=0,misses=0}
+	| salvo_hits _ [] = {hits=0,misses=0}
+	| salvo_hits (one_shot::[]) (one_ship::[]) = if (shot_hit one_shot one_ship)
+						     then {hits=1,misses=0}
+						     else {hits=0,misses=1}
 	| salvo_hits (shot::salvo) (ls as (one_ship::[])) = (salvo_hits (shot::[]) ls) + (salvo_hits salvo ls)
 	| salvo_hits (sl as (one_shot::[])) (ship::fleet) = (salvo_hits sl (ship::[])) + (salvo_hits sl fleet) 
 	| salvo_hits (shot::salvo) (fleet as (ship::fleet')) = (salvo_hits (shot::[]) fleet) + (salvo_hits salvo fleet)
-      val total = List.length(salvo)
-      val hits = salvo_hits salvo fleet
-      val misses = total - hits
-  in {hits=hits,misses=misses}
+  in salvo_hits salvo fleet
   end
 
       (*SECOND PART - BINARY*)
@@ -46,5 +46,5 @@ fun eval_bin bl =
 	    | (Zero,true) => eval bits (c-1)
 	    | (One,true) => ceil(Math.pow(2.0,real(c))) + eval bits (c-1)
   in eval bl (List.length(bl)-1)
-  end
+  end;
       eval_bin [One,Zero,Zero] = 4;
