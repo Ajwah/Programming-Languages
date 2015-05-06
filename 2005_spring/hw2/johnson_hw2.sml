@@ -31,3 +31,20 @@ fun fleet_salvo_summary salvo fleet =
       val misses = total - hits
   in {hits=hits,misses=misses}
   end
+
+      (*SECOND PART - BINARY*)
+
+datatype bit = One | Zero
+type binary_number = bit list
+			 
+fun eval_bin bl =
+  let fun eval [] _ = 0
+	| eval (bit::bits) c =
+	  case (bit,c > 0) of
+	      (Zero,false) => 0
+	    | (One,false) => 1
+	    | (Zero,true) => eval bits (c-1)
+	    | (One,true) => ceil(Math.pow(2.0,real(c))) + eval bits (c-1)
+  in eval bl (List.length(bl)-1)
+  end
+      eval_bin [One,Zero,Zero] = 4;
