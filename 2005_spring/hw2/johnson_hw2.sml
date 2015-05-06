@@ -47,4 +47,42 @@ fun eval_bin bl =
 	    | (One,true) => ceil(Math.pow(2.0,real(c))) + eval bits (c-1)
   in eval bl (List.length(bl)-1)
   end;
-      eval_bin [One,Zero,Zero] = 4;
+eval_bin [One,Zero,Zero] = 4;
+
+(*THIRD PART - MEMORY*)
+      
+infix mem
+fun x mem [] = false
+  | x mem (y::ys) = x=y orelse x mem ys
+fun newmem(x,xs) = if (x mem xs) then xs else x::xs
+
+fun setof ls = List.foldl (fn(x,acc)=> newmem(x,acc)) [] ls
+
+infix union
+fun [] union s2 = s2
+  | s1 union [] = s1
+  | (s::s1) union s2 = s1 union (newmem(s,s2));
+
+			  
+([1,2,3] union [2,3,4]) = [1,2,3,4];
+
+infix isect
+fun [] isect s = []
+  | s isect [] = []
+  | (s::s1) isect s2 = if (s mem s2)
+		       then s::(s1 isect s2)
+		       else (s1 isect s2);
+			       
+([1,2,3] isect [2,3,4]) = [2,3];
+fun one_cross e [] acc = acc
+  | one_cross e (x::xs') acc = one_cross e xs' (acc@[(e,x)]);
+					 
+(one_cross 1 [1,2,3] nil) = [(1,1),(1,2),(1,3)];
+
+fun one_cross_noaccum e [] = []
+  | one_cross_noaccum e (x::xs') = (one_cross_noaccum e xs')@[(e,x)]
+
+infix cross
+fun [] cross s = []
+  | s cross [] = []
+  | (s::s1) cross s2 = (s1 cross s2)@(one_cross s s2 [])
