@@ -126,3 +126,9 @@ fun bindatom (x,c) (a as (AtomVar v)) = if x=v then AtomConst c else a
   | bindatom _ a = a
 
 fun bindpred (s as (x,c)) {pred=p,vals=v} = List.map (fn(a)=>bindatom s a) v
+fun filter pred [] = []
+  | filter pred (l::ls') = if pred l then l::(filter pred ls') else (filter pred ls')
+fun getconsts (AtomConst _) = true
+  | getconsts _  = false 
+fun getvars (AtomVar _) = true
+  | getvars _  = false
