@@ -124,16 +124,17 @@ val state = [ {pred="At", vals=[AtomConst "home"]},
 (*val buy_precond = And({pred="At", vals=[AtomVar "place"]},
                       {pred="Sells", vals=[AtomVar "place",AtomVar "item"]});
  *)
-val x = AtomVar "x"; val y = AtomVar "y";
+val x = AtomVar "x"; val y = AtomVar "y";  val z = AtomVar "z";
 val QFC = AtomConst "QFC"; val Ace = AtomConst "Ace";
 val Eggs = AtomConst "Eggs"; val Nails = AtomConst "Nails";
 fun At(x) = {pred="At", vals=[x]};
 fun Sells(x,y) = {pred="Sells",vals=[x,y]};
+fun Have(x) = {pred="Have", vals=[x]};
 
 fun bindatom (x,c) (a as (AtomVar v)) = if x=v then AtomConst c else a
   | bindatom _ a = a
 
-fun bindpred (s as (x,c)) {pred=p,vals=v} = List.map (fn(a)=>bindatom s a) v
+fun bindpred (s as (x,c)) {pred=p,vals=v} = {pred=p,vals=(List.map (fn(a)=>bindatom s a) v)}
 fun filter pred [] = []
   | filter pred (l::ls') = if pred l then l::(filter pred ls') else (filter pred ls')
 fun getconsts (AtomConst _) = true
@@ -177,4 +178,5 @@ fun get_binding [] [] = []
 get_binding [AtomVar "x", AtomVar "y"] [QFC,Eggs];
 get_binding [QFC,AtomVar "y"] [QFC,Eggs];
 
-		  
+fun apply_binding bindings pl = List.map (fn(e)=> (List.foldl (fn(b,acc)=> bindpred b acc) e bindings)) pl
+fun bindings_for_one_pred {pred=p,vals=v} s = List.map (fn({pred=q,vals=w})=> get_binding v w) s
