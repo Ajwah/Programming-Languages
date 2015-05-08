@@ -63,10 +63,51 @@ fun changevar v b e = bind (fn(x)=> if x = v then Var b else Var x) e;
 (bindvar "x" true (And(Var "x",Or(Var "y", Var "x")))) = And(Const true,Or(Var "y", Const true));
 (changevar "x" "help" (And(Var "x",Or(Var "y", Var "x")))) = (And(Var "help",Or(Var "y", Var "help")));
 
+fun create_bytes ls = 
+  let val n = List.length ls
+      val all = ceil(Math.pow(2.0,real(n))) - 1
+      fun construct_units _ 0 _ = []
+	| construct_units (v::vs') n t =
+	  let val size = ceil(Math.pow(2.0,real(n-1)))
+	      fun loop 0 v b = []
+		| loop n v b = ((v,b),(bindvar v b))::(loop (n-1) v b)
+	      fun unit v = (loop size v true)@(loop size v false)
+	      fun dupl 0 = []
+		| dupl n = (unit v)@(dupl (n-1))
+	  in [(dupl t)]@(construct_units vs' (n-1) (t*2))
+	  end
+	      
+      val units = construct_units ls n 1
+      fun create_byte i = List.map (fn(l)=>List.nth(l,i)) units
+      fun loop ~1 = []
+	| loop n = (create_byte n)::(loop (n-1))
+  in loop all
+  end
+
 fun satisfying_assignments e =
-  let fun helper f e l r =
-	case f of
-	    [] => (l,r,(List.map (fn(x)=> eval x handle UnboundVar => false) e))
-	  | f::f' => helper f' ((List.foldl (fn(x,acc)=> (bindvar f true x)::(bindvar f false x)::acc) [] e)@e) ((f,true,e)::l) ((f,false,e)::r)
-  in helper (free_vars e) [e] [] []
+  let val vars = free_vars e
+      val size = List.length vars
+      val bindings = create_bytes vars
+      fun partial_binding_expr ((b as binding,f),(acc,result)) = (acc@[b],(f result))
+      fun apply_bindings ls =
+	let val (a as applied_binding_summary,c as concrete_expr) = (List.foldl (partial_binding_expr)
+										([],e)
+										ls)
+	in (a, eval c)
+	end
+      val enumeration_results = List.map (fn(ls) => apply_bindings ls) bindings
+      val relevant_results = List.foldl (fn((a,b),acc)=> if b then acc@[a] else acc)
+						 []
+						 enumeration_results
+  in
+      relevant_results
   end;
+
+
+satisfying_assignments (And(Not(Var "x"),Or(Const true, Var "x"))) = [[("x",false)]];
+satisfying_assignments (And(Not(Var "x"),Or(Const false, Var "x"))) = nil;
+satisfying_assignments (Or(Var "x", Var "y")) = [
+    [("y",false),("x",true)],[("y",true),("x",false)],[("y",true),("x",true)]
+];
+satisfying_assignments (Const true) = [[]];
+satisfying_assignments (Const false) = [];
