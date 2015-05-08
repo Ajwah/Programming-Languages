@@ -116,12 +116,20 @@ satisfying_assignments (Const false) = [];
 
 datatype atom = AtomConst of string | AtomVar of string
 type predicate = { pred : string, vals : atom list };
+exception BadGetBinding
+	      
 val state = [ {pred="At", vals=[AtomConst "home"]},
               {pred="Sells",vals=[AtomConst "QFC", AtomConst "Eggs"]} ];
 
 (*val buy_precond = And({pred="At", vals=[AtomVar "place"]},
                       {pred="Sells", vals=[AtomVar "place",AtomVar "item"]});
-*)
+ *)
+val x = AtomVar "x"; val y = AtomVar "y";
+val QFC = AtomConst "QFC"; val Ace = AtomConst "Ace";
+val Eggs = AtomConst "Eggs"; val Nails = AtomConst "Nails";
+fun At(x) = {pred="At", vals=[x]};
+fun Sells(x,y) = {pred="Sells",vals=[x,y]};
+
 fun bindatom (x,c) (a as (AtomVar v)) = if x=v then AtomConst c else a
   | bindatom _ a = a
 
@@ -154,3 +162,19 @@ satisfying_matches {pred="Sells", vals=[AtomVar "x", AtomVar "y"]}
 		    {pred="Sells", vals=[AtomConst "Ace", AtomConst "Nails"]},
 		    {pred="At", vals=[AtomConst "Home"]},
 		    {pred="Sells", vals=[AtomConst "QFC", AtomConst "Milk"]}];
+satisfying_matches (Sells(x,y)) [At(x),Sells(x,y), At(QFC),Sells(QFC,Eggs)];
+
+fun get_binding [] [] = []
+  | get_binding (x::xs') [] = raise BadGetBinding
+  | get_binding [] (y::ys') = raise BadGetBinding				    
+  | get_binding (x::xs') (y::ys') =
+    case (x,y) of
+	(AtomVar a, AtomConst b) => (a,b)::(get_binding xs' ys')
+     |  (AtomVar a, AtomVar b) => (a,b)::(get_binding xs' ys')
+     |  (AtomConst a, AtomConst b)=> if (a=b) then (get_binding xs' ys') else raise BadGetBinding
+     |  _ => raise BadGetBinding;
+
+get_binding [AtomVar "x", AtomVar "y"] [QFC,Eggs];
+get_binding [QFC,AtomVar "y"] [QFC,Eggs];
+
+		  
