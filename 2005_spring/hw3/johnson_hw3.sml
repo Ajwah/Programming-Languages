@@ -111,3 +111,18 @@ satisfying_assignments (Or(Var "x", Var "y")) = [
 ];
 satisfying_assignments (Const true) = [[]];
 satisfying_assignments (Const false) = [];
+
+(*PART II*)
+
+datatype atom = AtomConst of string | AtomVar of string
+type predicate = { pred : string, vals : atom list };
+val state = [ {pred="At", vals=[AtomConst "home"]},
+              {pred="Sells",vals=[AtomConst "QFC", AtomConst "Eggs"]} ];
+
+(*val buy_precond = And({pred="At", vals=[AtomVar "place"]},
+                      {pred="Sells", vals=[AtomVar "place",AtomVar "item"]});
+*)
+fun bindatom (x,c) (a as (AtomVar v)) = if x=v then AtomConst c else a
+  | bindatom _ a = a
+
+fun bindpred (s as (x,c)) {pred=p,vals=v} = List.map (fn(a)=>bindatom s a) v
