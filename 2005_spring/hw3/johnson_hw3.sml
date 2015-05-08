@@ -132,3 +132,25 @@ fun getconsts (AtomConst _) = true
   | getconsts _  = false 
 fun getvars (AtomVar _) = true
   | getvars _  = false
+
+fun satisfying_matches pred (state as []) = []
+  | satisfying_matches (pred as {pred=p,vals=v}) ({pred=q,vals=w}::s') =
+    let val is_pass_precheck = (p=q) andalso (List.length(v) = List.length(w))
+	fun comp_vals (AtomVar _) _ = true
+	  | comp_vals (AtomConst a) (AtomConst b) = a=b
+	  | comp_vals _ _ = false
+	fun get_value (AtomVar v) = v
+	  | get_value (AtomConst v) = v 
+	fun compare [] [] acc = acc
+	  | compare (v::vs') (w::ws') acc =
+	    if (comp_vals v w) then (compare vs' ws' (acc@[get_value w])) else [] 
+    in if is_pass_precheck
+       then (compare v w [])::(satisfying_matches pred s')
+       else (satisfying_matches pred s')
+    end;
+							    
+satisfying_matches {pred="Sells", vals=[AtomVar "x", AtomVar "y"]}
+                   [{pred="Sells", vals=[AtomConst "QFC", AtomConst "Eggs"]},
+		    {pred="Sells", vals=[AtomConst "Ace", AtomConst "Nails"]},
+		    {pred="At", vals=[AtomConst "Home"]},
+		    {pred="Sells", vals=[AtomConst "QFC", AtomConst "Milk"]}];
