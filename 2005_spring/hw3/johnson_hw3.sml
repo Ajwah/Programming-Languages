@@ -127,6 +127,8 @@ val state = [ {pred="At", vals=[AtomConst "home"]},
 val x = AtomVar "x"; val y = AtomVar "y";  val z = AtomVar "z";
 val QFC = AtomConst "QFC"; val Ace = AtomConst "Ace";
 val Eggs = AtomConst "Eggs"; val Nails = AtomConst "Nails";
+val Home = AtomConst "Home"; val Away = AtomConst "Away";
+val Milk = AtomConst "Milk"; val Ace = AtomConst "Ace";
 fun At(x) = {pred="At", vals=[x]};
 fun Sells(x,y) = {pred="Sells",vals=[x,y]};
 fun Have(x) = {pred="Have", vals=[x]};
@@ -137,10 +139,10 @@ fun bindatom (x,c) (a as (AtomVar v)) = if x=v then AtomConst c else a
 fun bindpred (s as (x,c)) {pred=p,vals=v} = {pred=p,vals=(List.map (fn(a)=>bindatom s a) v)}
 fun filter pred [] = []
   | filter pred (l::ls') = if pred l then l::(filter pred ls') else (filter pred ls')
-fun getconsts (AtomConst _) = true
-  | getconsts _  = false 
-fun getvars (AtomVar _) = true
-  | getvars _  = false
+fun getconsts ls = filter (fn(v)=> case v of (AtomConst a) => true | _  => false) ls;
+getconsts [QFC,Eggs,Home,Milk,Nails,Away,Ace,x,y,z];
+fun getvars ls = filter (fn(v)=> case v of (AtomVar a) => true | _  => false) ls;
+getvars [QFC,Eggs,Home,Milk,Nails,Away,Ace,x,y,z];
 
 fun satisfying_matches pred (state as []) = []
   | satisfying_matches (pred as {pred=p,vals=v}) ({pred=q,vals=w}::s') =
@@ -179,4 +181,11 @@ get_binding [AtomVar "x", AtomVar "y"] [QFC,Eggs];
 get_binding [QFC,AtomVar "y"] [QFC,Eggs];
 
 fun apply_binding bindings pl = List.map (fn(e)=> (List.foldl (fn(b,acc)=> bindpred b acc) e bindings)) pl
-fun bindings_for_one_pred {pred=p,vals=v} s = List.map (fn({pred=q,vals=w})=> get_binding v w) s
+fun bindings_for_one_pred {pred=p,vals=v} s = List.filter List.map (fn({pred=q,vals=w})=>
+							   if (p=q)
+							   then get_binding v w
+							   else []) s;
+bindings_for_one_pred (At(Home)) [At(Home)];
+bindings_for_one_pred (At(Home)) [At(Away)] handle BadGetBinding => [];
+
+fun bindings_for_preds pl s = List.map (fn(p)=> bindings_for_one_pred p s) pl 
