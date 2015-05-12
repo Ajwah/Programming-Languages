@@ -1,4 +1,5 @@
 datatype eval_let_type = SML | Scheme
+
 val type_of_eval = SML
 		       
 datatype 'a expr =
@@ -14,7 +15,7 @@ datatype 'a expr =
 				 
 exception UnboundVariable
 exception SyntaxError
-val printl = List.foldl (fn((pv,pi),acc)=> acc^"("^pv^","^Int.toString(pi)^") - ") ""
+			
 fun lookup v en = case (List.find (fn(var,vl)=> v=var) en) of
 		      NONE => raise UnboundVariable
 		    | SOME (var,vl) => vl
@@ -23,12 +24,12 @@ fun process_let e v_init vl_init en ls' =
   let val let_SML =  List.foldl (fn(Bind (v,vl),acc)=> (v,eval vl acc)::acc)
 				((v_init, eval vl_init en)::en)
 				ls'
-      val let_Scheme = List.foldl (fn(Bind (v,vl),acc)=> (print ("\n Foldl "^printl acc^"\n Env: "^printl en);acc@[(v,eval vl en)] handle UnboundVariable => (print "UnboundVar: ";acc@[(v,eval vl acc)])))
+      val let_Scheme = List.foldl (fn(Bind (v,vl),acc)=> acc@[(v,eval vl en)] handle UnboundVariable => acc@[(v,eval vl acc)])
 				  [(v_init, eval vl_init en)]
 				  ls'
   in case type_of_eval of
 	 SML => eval e let_SML
-       | Scheme => (print ("\n Scheme "^printl (let_Scheme@en)); eval e (let_Scheme@en))
+       | Scheme => eval e (let_Scheme@en)
   end  
 and eval ex en =
   case ex of
@@ -40,7 +41,7 @@ and eval ex en =
     | `* (a,b) => (eval a en) * (eval b en)
     | `/ (a,b) => (eval a en) div (eval b en)
     | Let ([],_)  => raise SyntaxError
-    | Let ((Bind (v_init,vl_init))::ls',e) => (print ("\n Let ("^v_init^","^Int.toString(eval vl_init en)^")");process_let e v_init vl_init en ls')
+    | Let ((Bind (v_init,vl_init))::ls',e) => process_let e v_init vl_init en ls'
       
 val e1 = Const 5;
 val e2 = `+(Const 5, Const 3);
