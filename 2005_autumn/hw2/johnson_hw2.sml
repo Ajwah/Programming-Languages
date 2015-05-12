@@ -97,9 +97,14 @@ val e31 = Let([Bind("x",Const(3)), Bind("y",`+(Var("x"),Const(10)))] ,`+(Var("x"
 val e32 = Let([Bind("x",Const(3)), Bind("y",`~ (Var("x")))] ,Let([Bind("x",Const (100))],`+(Var("x"),Var("y"))));
 val e33 = Let([Bind("x",Const(3)), Bind("y",`+ (Var("x"), Const 1))] ,Let([Bind("x",`+(Var "x", Var "y")),Bind("y",`+(Var "x", Var "y"))],`+(Var("x"),Var("y"))));
 val e34 = Let([Bind("x",Const(3))], Let([Bind("x",Const (100)), Bind("y", Var "x")],`+(Var("x"),Var("y"))));
+val e35 = Let([Bind("x",Const(3))], Let([Bind("x",Const (100)), Bind("y", Var "x")], Let([Bind("x", Const 15),Bind("y", Const 5)],`+(Var("x"),Var("y")))));
+val e36 = Let([Bind("x",Const(3))], Let([Bind("x",Const (100)), Bind("y", Var "x")], Let([Bind("x", Var "x"),Bind("y", Var "y")],`+(Var("x"),Var("y")))));
+
 
 eval e30 [] = 7;
 eval e31 [] = 0 handle UnboundVariable => true;
 eval e32 [] = 97;
 eval e33 [] =  (if type_of_eval = SML then 18 else 14);
 eval e34 [] =  (if type_of_eval = SML then 200 else 103);
+eval e35 [] =  (if type_of_eval = SML then 20 else 20);
+eval e36 [] =  (if type_of_eval = SML then 200 else 103);
