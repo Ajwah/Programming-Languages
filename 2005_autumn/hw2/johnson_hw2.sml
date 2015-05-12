@@ -1,5 +1,5 @@
 datatype eval_let_type = SML | Scheme
-val type_of_eval = Scheme
+val type_of_eval = SML
 		       
 datatype 'a expr =
 	 Const of 'a
@@ -23,12 +23,12 @@ fun process_let e v_init vl_init en ls' =
   let val let_SML =  List.foldl (fn(Bind (v,vl),acc)=> (v,eval vl acc)::acc)
 				((v_init, eval vl_init en)::en)
 				ls'
-      val let_Scheme = List.foldl (fn(Bind (v,vl),acc)=> (print ("\n Foldl "^printl acc^"\n Env: "^printl en);acc@[(v,eval vl acc)] handle UnboundVariable => (print "UnboundVar: ";acc@[(v,eval vl en)])))
+      val let_Scheme = List.foldl (fn(Bind (v,vl),acc)=> (print ("\n Foldl "^printl acc^"\n Env: "^printl en);acc@[(v,eval vl en)] handle UnboundVariable => (print "UnboundVar: ";acc@[(v,eval vl acc)])))
 				  [(v_init, eval vl_init en)]
 				  ls'
   in case type_of_eval of
 	 SML => eval e let_SML
-       | Scheme => (print ("\n Scheme "^printl (let_Scheme@en)); eval e (List.rev(let_Scheme)@en))
+       | Scheme => (print ("\n Scheme "^printl (let_Scheme@en)); eval e (let_Scheme@en))
   end  
 and eval ex en =
   case ex of
