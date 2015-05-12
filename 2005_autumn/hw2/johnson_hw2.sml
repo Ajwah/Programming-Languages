@@ -1,3 +1,6 @@
+datatype eval_let_type = SML | Scheme
+val type_of_eval = Scheme
+		       
 datatype 'a expr =
 	 Const of 'a
 	 | Var of string
@@ -11,12 +14,23 @@ datatype 'a expr =
 				 
 exception UnboundVariable
 exception SyntaxError
-
+val printl = List.foldl (fn((pv,pi),acc)=> acc^"("^pv^","^Int.toString(pi)^") - ") ""
 fun lookup v en = case (List.find (fn(var,vl)=> v=var) en) of
-		   NONE => raise UnboundVariable
-		 | SOME (var,vl) => vl
-	      
-fun eval ex en =
+		      NONE => raise UnboundVariable
+		    | SOME (var,vl) => vl
+					  
+fun process_let e v_init vl_init en ls' =
+  let val let_SML =  List.foldl (fn(Bind (v,vl),acc)=> (v,eval vl acc)::acc)
+				((v_init, eval vl_init en)::en)
+				ls'
+      val let_Scheme = List.foldl (fn(Bind (v,vl),acc)=> (print ("\n Foldl "^printl acc^"\n Env: "^printl en);acc@[(v,eval vl acc)] handle UnboundVariable => (print "UnboundVar: ";acc@[(v,eval vl en)])))
+				  [(v_init, eval vl_init en)]
+				  ls'
+  in case type_of_eval of
+	 SML => eval e let_SML
+       | Scheme => (print ("\n Scheme "^printl (let_Scheme@en)); eval e (List.rev(let_Scheme)@en))
+  end  
+and eval ex en =
   case ex of
       Const a => a
     | Var a => lookup a en
@@ -26,13 +40,8 @@ fun eval ex en =
     | `* (a,b) => (eval a en) * (eval b en)
     | `/ (a,b) => (eval a en) div (eval b en)
     | Let ([],_)  => raise SyntaxError
-    | Let ((Bind (v_init,vl_init))::ls',e) =>
-      let val ext_en = List.foldl (fn(Bind (v,vl),acc)=> (v,eval vl acc)::acc)
-				       ((v_init, eval vl_init en)::en)
-				       ls'
-	   in eval e ext_en
-	   end
-
+    | Let ((Bind (v_init,vl_init))::ls',e) => (print ("\n Let ("^v_init^","^Int.toString(eval vl_init en)^")");process_let e v_init vl_init en ls')
+      
 val e1 = Const 5;
 val e2 = `+(Const 5, Const 3);
 val e3 = `-(Const 5, Const 3);
@@ -87,8 +96,10 @@ val e30 = Let([Bind("x",Const(3)), Bind("y",`+(Var("x"),Const(1)))] ,`+(Var("x")
 val e31 = Let([Bind("x",Const(3)), Bind("y",`+(Var("x"),Const(10)))] ,`+(Var("x"),`+(Var("y"),Var("z"))));
 val e32 = Let([Bind("x",Const(3)), Bind("y",`~ (Var("x")))] ,Let([Bind("x",Const (100))],`+(Var("x"),Var("y"))));
 val e33 = Let([Bind("x",Const(3)), Bind("y",`+ (Var("x"), Const 1))] ,Let([Bind("x",`+(Var "x", Var "y")),Bind("y",`+(Var "x", Var "y"))],`+(Var("x"),Var("y"))));
+val e34 = Let([Bind("x",Const(3))], Let([Bind("x",Const (100)), Bind("y", Var "x")],`+(Var("x"),Var("y"))));
 
 eval e30 [] = 7;
 eval e31 [] = 0 handle UnboundVariable => true;
 eval e32 [] = 97;
-eval e33 [] = 18;
+eval e33 [] =  (if type_of_eval = SML then 18 else 14);
+eval e34 [] =  (if type_of_eval = SML then 200 else 103);
