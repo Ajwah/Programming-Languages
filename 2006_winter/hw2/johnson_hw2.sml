@@ -40,7 +40,24 @@ fun earnedScore (nil) = 0
 (* Part 2 of Basra Game *)
 
 (* Capture *)
-fun capture(floor: cards, card: card) = ( (* implement your capture function here *) )
+fun capture(floor: cards, card: card) = ()
+val l2s = List.foldl (fn(e,acc)=> acc^" "^Int.toString(e)) ""
+val ll2s = List.foldl (fn(e,acc)=>acc^"\n       "^(l2s e)) ""
+		      
+fun combinations [] = []
+  | combinations initial_list =
+    let val (init_el::remainder) = initial_list
+	fun comb [] _ _ = []
+	  | comb (l::[]) residu acc =
+	    let val mappings = List.map (fn(el)=>acc@[el]) (l::residu@[l])
+	    in (print ("\n Mapping (l::residu): "^(l2s (residu@[l]))^" unto acc:"^(l2s acc)^"\n results: "^(ll2s mappings));
+		(comb acc (residu@[l]) [])@mappings)
+	    end 
+	  | comb (l::ls) residu acc = (print ("\n Element l : "^Int.toString(l)^" - List ls: "^(l2s ls)^" residu: "^(l2s residu)^" acc: "^(l2s acc)^" acc@[l]: "^(l2s (acc@[l])) );
+				       comb ls residu (acc@[l]))
+    in comb initial_list [] []
+    end;
+print ("\n next: "^(ll2s (combinations [1,2,3,4,5,6,7,8,9,0])));
 
 (* Game Over *)
 fun isGameOver (deck: cards, floor: cards, hand: cards) = ( (* implement your isGameOver function here *) )
