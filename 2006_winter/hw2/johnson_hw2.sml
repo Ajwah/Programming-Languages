@@ -51,17 +51,20 @@ fun earnedScore (nil) = 0
 (* Part 2 of Basra Game *)
 
 (* Capture *)
-fun capture(floor: cards, card: card) = ()
-
-fun combinations [] = []
-  | combinations (head::[]) = [[head]]
-  | combinations (head::neck::tail) =
-    let fun fold a [] = []
-	  | fold a (l::ls') = (a@[l],ls')::(fold a ls')
-	fun enum [] = []
-	  | enum ((l1,l2)::ls') = l1::(enum(fold l1 l2)) @ enum ls'
-    in enum [([head],neck::tail)] @ combinations (neck::tail)
-    end;
+fun capture(floor: cards, card as (cs,cr): card) = 
+  let val summation = List.foldl (fn((_,cr),acc)=> cr+acc) 0  
+      fun combinations [] = []
+      | combinations (head::[]) = [[head]]
+      | combinations (head::neck::tail) =
+	let fun fold a [] = []
+	      | fold a (l::ls') = (a@[l],ls')::(fold a ls')
+	    fun enum [] = []
+	      | enum ((l1,l2)::ls') = l1::(enum(fold l1 l2)) @ enum ls'
+	in enum [([head],neck::tail)] @ combinations (neck::tail)
+	end;
+in
+    List.filter (fn(cl)=> summation cl = cr) (combinations floor)
+end
 
 (* Game Over *)
 fun isGameOver (deck: cards, floor: cards, hand: cards) = ( (* implement your isGameOver function here *) )
