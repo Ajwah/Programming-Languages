@@ -49,7 +49,7 @@ fun combinations [] = []
     let val (init_el::remainder) = initial_list
 	fun comb [] _ _ = []
 	  | comb (l::[]) residu acc =
-	    let val mappings = List.map (fn(el)=>acc@[el]) (l::residu@[l])
+	    let val mappings = List.map (fn(el)=>acc@[el]) (residu@[l])
 	    in (print ("\n Mapping (l::residu): "^(l2s (residu@[l]))^" unto acc:"^(l2s acc)^"\n results: "^(ll2s mappings));
 		(comb acc (residu@[l]) [])@mappings)
 	    end 
