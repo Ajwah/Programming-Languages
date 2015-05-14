@@ -43,7 +43,17 @@ fun earnedScore (nil) = 0
 fun capture(floor: cards, card: card) = ()
 val l2s = List.foldl (fn(e,acc)=> acc^" "^Int.toString(e)) ""
 val ll2s = List.foldl (fn(e,acc)=>acc^"\n       "^(l2s e)) ""
-		      
+fun combinations [] = []
+  | combinations (head::tail) =
+    let fun fold a [] prev = []
+	  | fold a (l::ls') prev = (a@[l],prev@ls')::(fold a ls' (l::prev))
+	fun enum [] = []
+	  | enum ((l1,l2)::ls') = l1::(enum(fold l1 l2 []))@(enum ls')
+    in enum [([head],tail)] 
+    end;
+fun display [] = (print "\n END")
+  | display (l::lls) = (print ("\n "^(l2s l)); display lls)
+(*		      
 fun combinations [] = []
   | combinations initial_list =
     let val (init_el::remainder) = initial_list
@@ -58,7 +68,7 @@ fun combinations [] = []
     in comb initial_list [] []
     end;
 print ("\n next: "^(ll2s (combinations [1,2,3,4,5,6,7,8,9,0])));
-
+*)
 (* Game Over *)
 fun isGameOver (deck: cards, floor: cards, hand: cards) = ( (* implement your isGameOver function here *) )
 
