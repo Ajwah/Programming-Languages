@@ -51,7 +51,7 @@ fun earnedScore (nil) = 0
 (* Part 2 of Basra Game *)
 
 (* Capture *)
-fun capture(floor: cards, card as (cs,cr): card) = 
+fun produceAllCaptures(floor: cards, card as (cs,cr): card) = 
   let val summation = List.foldl (fn((_,cr),acc)=> cr+acc) 0  
       fun combinations [] = []
       | combinations (head::[]) = [[head]]
