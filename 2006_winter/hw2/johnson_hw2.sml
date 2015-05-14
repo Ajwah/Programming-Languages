@@ -5,8 +5,19 @@ type rank = int;
 type card = suit * rank;
 type cards = card list;
 
-fun sort (lst: cards) = ()
-  	   
+fun sort (lst: cards) =
+  let val ln = length lst
+      val mid = ln div 2
+      val p as (ps,pr) = List.nth (lst,mid)
+      val left = List.filter (fn(es,er)=> er <= pr) lst
+      val right = List.filter (fn(es,er)=> er > pr) lst
+  in 
+      case ln of
+	  0 => []
+	| 1 => lst
+	| _ => (sort(left))@(sort(right))
+  end
+		   
 (* Part 1 of Basra Game *)
 
 (* 1 - 2 *)
