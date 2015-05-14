@@ -5,8 +5,8 @@ type rank = int;
 type card = suit * rank;
 type cards = card list;
 
-fun sort (lst: cards) = ( (* implement your sort function here *) )
-
+fun sort (lst: cards) = ()
+  	   
 (* Part 1 of Basra Game *)
 
 (* 1 - 2 *)
@@ -41,34 +41,17 @@ fun earnedScore (nil) = 0
 
 (* Capture *)
 fun capture(floor: cards, card: card) = ()
-val l2s = List.foldl (fn(e,acc)=> acc^" "^Int.toString(e)) ""
-val ll2s = List.foldl (fn(e,acc)=>acc^"\n       "^(l2s e)) ""
+
 fun combinations [] = []
-  | combinations (head::tail) =
-    let fun fold a [] prev = []
-	  | fold a (l::ls') prev = (a@[l],prev@ls')::(fold a ls' (l::prev))
+  | combinations (head::[]) = [[head]]
+  | combinations (head::neck::tail) =
+    let fun fold a [] = []
+	  | fold a (l::ls') = (a@[l],ls')::(fold a ls')
 	fun enum [] = []
-	  | enum ((l1,l2)::ls') = l1::(enum(fold l1 l2 []))@(enum ls')
-    in enum [([head],tail)] 
+	  | enum ((l1,l2)::ls') = l1::(enum(fold l1 l2)) @ enum ls'
+    in enum [([head],neck::tail)] @ combinations (neck::tail)
     end;
-fun display [] = (print "\n END")
-  | display (l::lls) = (print ("\n "^(l2s l)); display lls)
-(*		      
-fun combinations [] = []
-  | combinations initial_list =
-    let val (init_el::remainder) = initial_list
-	fun comb [] _ _ = []
-	  | comb (l::[]) residu acc =
-	    let val mappings = List.map (fn(el)=>acc@[el]) (residu@[l])
-	    in (print ("\n Mapping (l::residu): "^(l2s (residu@[l]))^" unto acc:"^(l2s acc)^"\n results: "^(ll2s mappings));
-		(comb acc (residu@[l]) [])@mappings)
-	    end 
-	  | comb (l::ls) residu acc = (print ("\n Element l : "^Int.toString(l)^" - List ls: "^(l2s ls)^" residu: "^(l2s residu)^" acc: "^(l2s acc)^" acc@[l]: "^(l2s (acc@[l])) );
-				       comb ls residu (acc@[l]))
-    in comb initial_list [] []
-    end;
-print ("\n next: "^(ll2s (combinations [1,2,3,4,5,6,7,8,9,0])));
-*)
+
 (* Game Over *)
 fun isGameOver (deck: cards, floor: cards, hand: cards) = ( (* implement your isGameOver function here *) )
 
