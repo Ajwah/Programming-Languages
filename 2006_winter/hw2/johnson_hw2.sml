@@ -91,17 +91,29 @@ fun produceUnshuffledDeck() =
 fun getRandomInt(max: int) =
     let
 	fun Seeder() = let val time = Time.toMilliseconds(Time.now())
-		   val time' = case Int.maxInt
-			       of NONE => time
-				| SOME x => LargeInt.mod(time, Int.toLarge x)
-	       in Int.fromLarge time'
-	       end
+			   val time' = case Int.maxInt
+					of NONE => time
+					 | SOME x => LargeInt.mod(time, Int.toLarge x)
+		       in Int.fromLarge time'
+		       end
 	val RandGen = Random.rand(Seeder(), Seeder())
     in
 	if max = 0 then NONE 
-	else SOME((Random.randInt(RandGen) mod max) + 1) (* Keep the +1 if you want it to generate from 1 to max, or remove it to generate from 0 to max - 1 *)
+	else SOME((Random.randInt(RandGen) mod max)) (* Keep the +1 if you want it to generate from 1 to max, or remove it to generate from 0 to max - 1 *)
     end
 
 (* produceShuffledDeck returns a shuffled deck of 52 distinct cards *)
-fun produceShuffledDeck() = ( (* implement your produceShuffledDeck function here *) )
+fun produceShuffledDeck() =
+  let val initial_deck = produceUnshuffledDeck()
+      fun shuffle deck initial_deck =
+	  let val SOME rnd = getRandomInt(52)
+	      val rnd_card as (s,r) = List.nth(initial_deck,rnd)
+	      val isDuplicate = List.exists (fn(c)=>rnd_card = c) deck
+	      val isComplete = (List.length deck) = 52
+	  in if isComplete then deck else if isDuplicate then shuffle deck initial_deck else shuffle (rnd_card::deck) initial_deck
+	  end
+      fun loop 0 shuffled = shuffled
+	| loop n sh = loop (n-1) (shuffle [] sh)
+  in loop 7 initial_deck
+  end
 
