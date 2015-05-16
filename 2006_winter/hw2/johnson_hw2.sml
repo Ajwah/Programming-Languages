@@ -67,7 +67,11 @@ in
 end
 
 (* Game Over *)
-fun isGameOver (deck: cards, floor: cards, hand: cards) = ( (* implement your isGameOver function here *) )
+fun isGameOver (deck: cards, floor: cards, hand: cards) =
+  case (deck,floor,hand) of
+      ([],[],_) => true
+    | (_,_,[]) => true
+    | (_,floor,hand) => List.length (floor) = 6 andalso (List.foldl (fn(c,acc)=> produceAllCaptures(floor,c)@acc) [] hand) = []
 
 (* Helper Function 1 for produceShuffledDeck: Generate a shuffled deck *)
 fun produceUnshuffledDeck() =
