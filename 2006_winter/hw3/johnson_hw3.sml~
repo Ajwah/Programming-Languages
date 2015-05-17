@@ -1,0 +1,4 @@
+fun lreduce f [] = []
+  | lreduce f [x] = [x]
+  | lreduce f (x::x'::xs') = (f x x') :: lreduce f ((f x x')::xs')
+						 
