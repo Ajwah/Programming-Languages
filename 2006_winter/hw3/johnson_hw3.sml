@@ -62,6 +62,29 @@ fun findMax t =
   in SOME (helper 0 t)
   end;
 
+fun traverse f t =
+  case t of
+      EmptyT => f EmptyT
+    | Tree (v, l, r) => f (Tree (v,l,r)) o traverse f l o traverse f r;
+
+fun summationT t = (traverse (fn(e)=>
+				case e of
+				    EmptyT => (fn(x)=>x+0)
+				  | Tree (v,l,r) => (fn(x)=>x+v)
+			    ) t) 0;
+
+fun countN t = (traverse (fn(e)=>
+				case e of
+				    EmptyT => (fn(x)=>x+0)
+				  | Tree (v,l,r) => (fn(x)=>x+1)
+			     ) t) 0;
+
+fun findM t = SOME((traverse (fn(e)=>
+			    case e of
+				EmptyT => (fn(x)=>x)
+			      | Tree (v,l,r) => (fn(x)=>if x>v then x else v)
+			) t) 0);
+
 val myTree = Tree(5, Tree(4, EmptyT, Tree(7, EmptyT, EmptyT)), Tree(8, Tree(11, EmptyT, EmptyT), EmptyT) );
 sumTree(myTree);
 countNodes(myTree);
