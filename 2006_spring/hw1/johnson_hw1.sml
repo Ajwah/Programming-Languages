@@ -32,7 +32,10 @@ exception IllegalConfig and
 	  NotEnemy and
 	  OnlyOneStep and
 	  OnlyTwoStepJump and
-	  ImpossibleError
+	  RangeOfStepsAnomaly and
+	  ImpossibleError1 and
+	  ImpossibleError2 and
+	  ImpossibleError3 
 	      
 fun legal_move c (p as (px,py,ps,pk))  (d as (dx,dy)) =
   let val moved as (mx,my) = (px+dx,px+dy)
@@ -47,7 +50,7 @@ fun legal_move c (p as (px,py,ps,pk))  (d as (dx,dy)) =
       val assert_DestinationOccupied = if piece_at c moved = NONE then false else raise DestinationOccupied
       val assert_P_in_C = if List.exists (fn(e)=>e=p) c then true else raise PieceNotPresent
 		      							
-      fun createSteppingRange (step as (x,y)) acc counterOccupied (enemyCoord: (int*int*int*bool) option) =
+      fun createSteppingRange (step as (x,y)) acc counterOccupied (enemyCoord: (int*int*int*bool) option) = 
 	let val nextStep = (x+ax,y+ay)
 	    val isOccupied = piece_at c nextStep
 	    val counter = if isOccupied = NONE then 0 else 1
@@ -56,12 +59,13 @@ fun legal_move c (p as (px,py,ps,pk))  (d as (dx,dy)) =
 	    fun assert_InterspersingIsEnemyOrEmpty NONE = true
 	      | assert_InterspersingIsEnemyOrEmpty (SOME (_,_,es,_)) = if ps <> es then true else raise NotEnemy
 	    val _ = assert_InterspersingIsEnemyOrEmpty enemyCo
-	in if abs(x)<abs(mx) andalso abs(y)<abs(my)
-	   then createSteppingRange nextStep ((nextStep,isOccupied)::acc) (counterOccupied+counter) enemyCo
+	in if x<>mx andalso y<>my
+	   then createSteppingRange nextStep ((nextStep,isOccupied)::acc) (counterOccupied+counter) enemyCo 
 	   else (acc,counterOccupied,enemyCoord)
 	end
 	    
       val (rangeOfSteps,piecesInbetween,enemyCoord) = createSteppingRange (px,py) [] 0 NONE
+      val assert_rangeOfSteps = if length rangeOfSteps = 0 then raise RangeOfStepsAnomaly else true (* rangeOfSteps is to contain at least the destination*)
       val isMultiplePiecesInterspersing = if piecesInbetween > 1 then raise MultiplePiecesInterspersing else false
 														 
       val isJump = piecesInbetween = 1 andalso length rangeOfSteps >= 2
@@ -69,20 +73,20 @@ fun legal_move c (p as (px,py,ps,pk))  (d as (dx,dy)) =
 									   
   in case pk of
 	 false => if isSlide andalso length rangeOfSteps = 1 then [((mx,my,ps,pk),[])] else
-		  if length rangeOfSteps = 0 then raise ImpossibleError else (*Impossible as handled by ZeroMove above*)
+		  if length rangeOfSteps = 0 then raise ImpossibleError1 else (*Impossible as handled by ZeroMove and RangeOfStepsAnomaly above*)
 		  if isSlide andalso length rangeOfSteps > 1 then raise OnlyOneStep else
 		  if isJump andalso length rangeOfSteps = 2 then [((mx,my,ps,pk),[enemyCoord])] else raise OnlyTwoStepJump
 															   
        | true  => if isSlide then [((mx,my,ps,pk),[])] else
-		  if length rangeOfSteps = 0 then raise ImpossibleError else (*Impossible as handled by ZeroMove above*)
-		  if isJump then [((mx,my,ps,pk),[enemyCoord])] else raise ImpossibleError
+		  if length rangeOfSteps = 0 then raise ImpossibleError2 else (*Impossible as handled by ZeroMove and RangeOfStepsAnomaly above*)
+		  if isJump then [((mx,my,ps,pk),[enemyCoord])] else raise ImpossibleError3
   end
 
 val name_hw = "2006 - Spring - Assignment One: Checkers";
 
 val p0 = (0,0,1,true) and q0 =(0,0);
 val p1 = (1,1,1,false) and q1 = (1,1);
-val p2 = (2,2,~1,true) and q2 = (2,2);
+val p2 = (2,2,~1,false) and q2 = (2,2);
 val p3 = (1,2,1,false) and q3 = (1,2);
 val p4 = (2,1,1,false) and q4 = (2,1);
 val p5 = (6,6,2,false) and q5 = (6,6);
@@ -111,6 +115,8 @@ val c52 = [p7,p0,p1,p4,p2,p1,p6];
 val c53 = [p4,p7,p0,p2,p1,p6,p1];
 
 val c6 = c30 @ c30 @ c30 @ c30 @ c30 @ c30 @ c30 (*Multiple Duplicates*)
+
+val d as dummy = [((~1,~1,5,true),[NONE])];
 
 fun f1_t p = legal_piece p = true;
 fun f1_f p = legal_piece p = false;
@@ -166,43 +172,79 @@ val tests = [
     ("3.21", f3_f c2 q3),
     ("3.22", f3_f c1 q3),
     ("3.23", f3_f c0 q3),
-
-    ("4.00", f4 c31 p0 (1,1) <> [] handle IllegalConfig => true),
-    ("4.01", f4 c41 p0 (1,1) <> [] handle IllegalConfig => true),
-    ("4.02", f4 c51 p0 (1,1) <> [] handle IllegalConfig => true),
-    ("4.03", f4 c6 p0 (1,1) <> [] handle IllegalConfig => true),
-    ("4.03", f4 [p8] p8 (1,1) <> [] handle IllegalConfig => true),
-    ("4.03", f4 [p9] p9 (1,1) <> [] handle IllegalConfig => true),
-
-    ("4.10", f4 c1 p0 (1,2) <> [] handle ImplausibleMove => true),
-    ("4.11", f4 c1 p0 (2,1) <> [] handle ImplausibleMove => true),
     
-    ("4.20", f4 [p1] p1 (~1,~1) <> [] handle IncorrectPlayingDirection => true),
-    ("4.21", f4 [p1] p1 (1,~1) <> [] handle IncorrectPlayingDirection => true),
-    ("4.22", f4 [p2] p2 (1,1) <> [] handle IncorrectPlayingDirection => true),
-    ("4.23", f4 [p2] p2 (~1,1) <> [] handle IncorrectPlayingDirection => true),
-    
-    ("4.30", f4 [p7] p7 (1,1) <> [] handle OutOfBoardRange => true),
-    ("4.31", f4 [p2] p2 (~3,~3) <> [] handle OutOfBoardRange => true),
-    ("4.32", f4 [p2] p2 (3,~3) <> [] handle OutOfBoardRange => true),
+    (* d is an impossible result so that true can only come about through handling the corresponding exception*)
+    ("4.00", f4 c31 p0 (1,1) = d handle IllegalConfig => true),
+    ("4.01", f4 c41 p0 (1,1) = d handle IllegalConfig => true),
+    ("4.02", f4 c51 p0 (1,1) = d handle IllegalConfig => true),
+    ("4.03", f4 c6 p0 (1,1) = d handle IllegalConfig => true),
+    ("4.03", f4 [p8] p8 (1,1) = d handle IllegalConfig => true),
+    ("4.03", f4 [p9] p9 (1,1) = d handle IllegalConfig => true),
 
-    ("4.40", f4 [p2,p0] p0 (2,2) <> [] handle DestinationOccupied => true),
+    ("4.10", f4 c1 p0 (1,2) = d handle ImplausibleMove => true),
+    ("4.11", f4 c1 p0 (2,1) = d handle ImplausibleMove => true),
+    
+    ("4.20", f4 [p1] p1 (~1,~1) = d handle IncorrectPlayingDirection => true),
+    ("4.21", f4 [p1] p1 (1,~1) = d handle IncorrectPlayingDirection => true),
+    ("4.22", f4 [p2] p2 (1,1) = d handle IncorrectPlayingDirection => true),
+    ("4.23", f4 [p2] p2 (~1,1) = d handle IncorrectPlayingDirection => true),
+    
+    ("4.30", f4 [p7] p7 (1,1) = d handle OutOfBoardRange => true),
+    ("4.31", f4 [p2] p2 (~3,~3) = d handle OutOfBoardRange => true),
+    ("4.32", f4 [p2] p2 (3,~3) = d handle OutOfBoardRange => true),
 
-    ("4.50", f4 [] p0 (1,1) <> [] handle PieceNotPresent => true),
-    ("4.51", f4 [p0] p1 (1,1) <> [] handle PieceNotPresent => true),
-    ("4.52", f4 c30 r0 (1,1) <> [] handle PieceNotPresent => true),
+    ("4.40", f4 [p2,p0] p0 (2,2) = d handle DestinationOccupied => true),
 
-    ("4.60", f4 [p0] p0 (0,0) <> [] handle ZeroMove => true),
-    ("4.61", f4 c30 p1 (0,0) <> [] handle ZeroMove => true),
+    ("4.50", f4 [] p0 (1,1) = d handle PieceNotPresent => true),
+    ("4.51", f4 [p0] p1 (1,1) = d handle PieceNotPresent => true),
+    ("4.52", f4 c30 r0 (1,1) = d handle PieceNotPresent => true),
 
-    ("4.70", f4 [p0,r1,p2] p0 (3,3) <> [] handle MultiplePiecesInterspersing => true),
+    ("4.60", f4 [p0] p0 (0,0) = d handle ZeroMove => true),
+    ("4.61", f4 c30 p1 (0,0) = d handle ZeroMove => true),
+
+    ("4.70", f4 [p0,r1,p2] p0 (3,3) = d handle MultiplePiecesInterspersing => true),
     
-    ("4.80", f4 [p0,p1] p0 (2,2) <> [] handle NotEnemy => true),
+    ("4.80", f4 [p0,p1] p0 (2,2) = d handle NotEnemy => true),
     
-    ("4.90", f4 [p1] p1 (5,5) <> [] handle OnlyOneStep => true),
+    ("4.90", f4 [p1] p1 (5,5) = d handle OnlyOneStep => true),
     
-    ("4.100", f4 [p1,p2] p1 (5,5) <> [] handle OnlyTwoStepJump => true)
+    ("4.100", f4 [p1,p2] p1 (5,5) = d handle OnlyTwoStepJump => true),
+
+    (*Different legal moves without capture*)
+    ("5.00", f4 [p0] p0 (1,1) = [((1,1,1,true),[])]),                            (*Legal moves on part of King*)
+    ("5.01", f4 [p0] p0 (5,5) = [((5,5,1,true),[])]),
+    ("5.00", f4 [(5,5,1,true)] (5,5,1,true) (~1,~1) = [((4,4,1,true),[])]),
+    ("5.00", f4 [(5,5,1,true)] (5,5,1,true) (~5,~5) = [((0,0,1,true),[])]),
+    ("5.00", f4 [(5,5,1,true)] (5,5,1,true) (~1,1) = [((4,6,1,true),[])]),
+    ("5.00", f4 [(5,5,1,true)] (5,5,1,true) (1,~1) = [((6,4,1,true),[])]),
+
+    ("5.00", f4 [(5,5,1,false)] (5,5,1,false) (~1,1) = [((4,6,1,false),[])]),    (*Legal Moves on part of Man 1 and ~1 respectively*)
+    ("5.00", f4 [(5,5,1,false)] (5,5,1,false) (1,1) = [((6,6,1,false),[])]),
+    ("5.00", f4 [(5,5,~1,false)] (5,5,~1,false) (~1,~1) = [((4,4,~1,false),[])]),
+    ("5.00", f4 [(5,5,~1,false)] (5,5,~1,false) (1,~1) = [((6,4,~1,false),[])]),
+
+    (*Make different captures*)
+    (*In proximity*)
+    ("5.00", f4 [(4,4,1,false),(5,5,~1,true)] (4,4,1,false) (2,2) = [((6,6,1,false),[SOME (5,5,~1,true)])]),
+    ("5.00", f4 [(4,4,1,true),(5,5,~1,true)] (4,4,1,true) (2,2) = [((6,6,1,true),[SOME (5,5,~1,true)])]),
     
+    ("5.00", f4 [(4,4,1,false),(5,5,~1,false)] (4,4,1,false) (2,2) = [((6,6,1,false),[SOME (5,5,~1,false)])]),
+    ("5.00", f4 [(4,4,1,true),(5,5,~1,false)] (4,4,1,true) (2,2) = [((6,6,1,true),[SOME (5,5,~1,false)])]),
+    
+    ("5.00", f4 [(4,4,1,false),(5,5,~1,true)] (5,5,~1,true) (~2,~2) = [((3,3,~1,true),[SOME (4,4,1,false)])]),
+    ("5.00", f4 [(4,4,1,false),(5,5,~1,false)] (5,5,~1,false) (~2,~2) = [((3,3,~1,false),[SOME (4,4,1,false)])]),
+
+    ("5.00", f4 [(4,4,1,true),(5,5,~1,true)] (5,5,~1,true) (~2,~2) = [((3,3,~1,true),[SOME (4,4,1,true)])]),
+    ("5.00", f4 [(4,4,1,true),(5,5,~1,false)] (5,5,~1,false) (~2,~2) = [((3,3,~1,false),[SOME (4,4,1,true)])]),
+
+    (*Distant Captures*)
+    ("5.00", f4 [(1,1,~1,true),(5,5,1,true)] (1,1,~1,true) (5,5) = [((6,6,~1,true),[SOME (5,5,1,true)])]),
+    ("5.00", f4 [(1,1,~1,true),(5,5,1,true)] (5,5,1,true) (~5,~5) = [((0,0,1,true),[SOME (1,1,~1,true)])]),
+
+    (*Distant Captures with far landing*)
+    ("5.00", f4 [(1,1,~1,true),(5,5,1,true)] (1,1,~1,true) (6,6) = [((7,7,~1,true),[SOME (5,5,1,true)])]),
+    ("5.00", f4 [(3,3,~1,true),(5,5,1,true)] (5,5,1,true) (~5,~5) = [((0,0,1,true),[SOME (3,3,~1,true)])]) 
+
 ];
 print ("\n"^Int.toString(List.length(tests))^" TOTAL TESTS RUN----------------------"^name_hw^"--------------------------\n"); (*Name display to assert correct test file is running*)
 fun all_tests(tests) =
