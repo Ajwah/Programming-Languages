@@ -73,14 +73,14 @@ fun legal_move_core c (p as (px,py,ps,pk))  (d as (dx,dy)) =
       val isSlide = piecesInbetween = 0 andalso length rangeOfSteps >= 1
 									   
   in case pk of
-	 false => if isSlide andalso length rangeOfSteps = 1 then [((mx,my,ps,pk),[])] else
+	 false => if isSlide andalso length rangeOfSteps = 1 then [(p,(mx,my,ps,pk),[])] else
 		  if length rangeOfSteps = 0 then raise ImpossibleError1 else (*Impossible as handled by ZeroMove and RangeOfStepsAnomaly above*)
 		  if isSlide andalso length rangeOfSteps > 1 then raise OnlyOneStep else
-		  if isJump andalso length rangeOfSteps = 2 then [((mx,my,ps,pk),[enemyCoord])] else raise OnlyTwoStepJump
+		  if isJump andalso length rangeOfSteps = 2 then [(p,(mx,my,ps,pk),[enemyCoord])] else raise OnlyTwoStepJump
 															   
-       | true  => if isSlide then [((mx,my,ps,pk),[])] else
+       | true  => if isSlide then [(p,(mx,my,ps,pk),[])] else
 		  if length rangeOfSteps = 0 then raise ImpossibleError2 else (*Impossible as handled by ZeroMove and RangeOfStepsAnomaly above*)
-		  if isJump then [((mx,my,ps,pk),[enemyCoord])] else raise ImpossibleError3 (*If it is not isSlide then piecesInbetween has to be 1 as more than one is handled above by MultiplePiecesI                                                                                             nterspersing. Also, since it is not isSlide, then rangeOfSteps has to be at least two as negative is an imp                                                                                             ossible listlength and as 0 is handled above by RangeOfStepAnomaly and 1 is denied by it not being isSlide*)
+		  if isJump then [(p,(mx,my,ps,pk),[enemyCoord])] else raise ImpossibleError3 (*If it is not isSlide then piecesInbetween has to be 1 as more than one is handled above by MultiplePiecesI                                                                                             nterspersing. Also, since it is not isSlide, then rangeOfSteps has to be at least two as negative is an imp                                                                                             ossible listlength and as 0 is handled above by RangeOfStepAnomaly and 1 is denied by it not being isSlide*)
   end
 
 fun legal_move c (p as (px,py,ps,pk)) (d as (dx,dy)) = legal_move c p d handle _ => []
@@ -136,7 +136,7 @@ val c53 = [p4,p7,p0,p2,p1,p6,p1];
 
 val c6 = c30 @ c30 @ c30 @ c30 @ c30 @ c30 @ c30 (*Multiple Duplicates*)
 
-val d as dummy = [((~1,~1,5,true),[NONE])];
+val d as dummy = [((~1,~1,5,true),(~1,~1,5,true),[NONE])];
 
 fun f1_t p = legal_piece p = true;
 fun f1_f p = legal_piece p = false;
@@ -231,39 +231,39 @@ val tests = [
     ("4.100", f4 [p1,p2] p1 (5,5) = d handle OnlyTwoStepJump => true),
 
     (*Different legal moves without capture*)
-    ("5.00", f4 [p0] p0 (1,1) = [((1,1,1,true),[])]),                            (*Legal moves on part of King*)
-    ("5.01", f4 [p0] p0 (5,5) = [((5,5,1,true),[])]),
-    ("5.00", f4 [(5,5,1,true)] (5,5,1,true) (~1,~1) = [((4,4,1,true),[])]),
-    ("5.00", f4 [(5,5,1,true)] (5,5,1,true) (~5,~5) = [((0,0,1,true),[])]),
-    ("5.00", f4 [(5,5,1,true)] (5,5,1,true) (~1,1) = [((4,6,1,true),[])]),
-    ("5.00", f4 [(5,5,1,true)] (5,5,1,true) (1,~1) = [((6,4,1,true),[])]),
+    ("5.00", f4 [p0] p0 (1,1) = [(p0,(1,1,1,true),[])]),                            (*Legal moves on part of King*)
+    ("5.01", f4 [p0] p0 (5,5) = [(p0,(5,5,1,true),[])]),
+    ("5.02", f4 [(5,5,1,true)] (5,5,1,true) (~1,~1) = [((5,5,1,true),(4,4,1,true),[])]),
+    ("5.03", f4 [(5,5,1,true)] (5,5,1,true) (~5,~5) = [((5,5,1,true),(0,0,1,true),[])]),
+    ("5.04", f4 [(5,5,1,true)] (5,5,1,true) (~1,1) = [((5,5,1,true),(4,6,1,true),[])]),
+    ("5.05", f4 [(5,5,1,true)] (5,5,1,true) (1,~1) = [((5,5,1,true),(6,4,1,true),[])]),
 
-    ("5.00", f4 [(5,5,1,false)] (5,5,1,false) (~1,1) = [((4,6,1,false),[])]),    (*Legal Moves on part of Man 1 and ~1 respectively*)
-    ("5.00", f4 [(5,5,1,false)] (5,5,1,false) (1,1) = [((6,6,1,false),[])]),
-    ("5.00", f4 [(5,5,~1,false)] (5,5,~1,false) (~1,~1) = [((4,4,~1,false),[])]),
-    ("5.00", f4 [(5,5,~1,false)] (5,5,~1,false) (1,~1) = [((6,4,~1,false),[])]),
+    ("5.10", f4 [(5,5,1,false)] (5,5,1,false) (~1,1) = [((5,5,1,false),(4,6,1,false),[])]),    (*Legal Moves on part of Man 1 and ~1 respectively*)
+    ("5.11", f4 [(5,5,1,false)] (5,5,1,false) (1,1) = [((5,5,1,false),(6,6,1,false),[])]),
+    ("5.12", f4 [(5,5,~1,false)] (5,5,~1,false) (~1,~1) = [((5,5,~1,false),(4,4,~1,false),[])]),
+    ("5.13", f4 [(5,5,~1,false)] (5,5,~1,false) (1,~1) = [((5,5,~1,false),(6,4,~1,false),[])]),
 
     (*Make different captures*)
     (*In proximity*)
-    ("5.00", f4 [(4,4,1,false),(5,5,~1,true)] (4,4,1,false) (2,2) = [((6,6,1,false),[SOME (5,5,~1,true)])]),
-    ("5.00", f4 [(4,4,1,true),(5,5,~1,true)] (4,4,1,true) (2,2) = [((6,6,1,true),[SOME (5,5,~1,true)])]),
+    ("5.20", f4 [(4,4,1,false),(5,5,~1,true)] (4,4,1,false) (2,2) = [((4,4,1,false),(6,6,1,false),[SOME (5,5,~1,true)])]),
+    ("5.21", f4 [(4,4,1,true),(5,5,~1,true)] (4,4,1,true) (2,2) = [((4,4,1,true),(6,6,1,true),[SOME (5,5,~1,true)])]),
     
-    ("5.00", f4 [(4,4,1,false),(5,5,~1,false)] (4,4,1,false) (2,2) = [((6,6,1,false),[SOME (5,5,~1,false)])]),
-    ("5.00", f4 [(4,4,1,true),(5,5,~1,false)] (4,4,1,true) (2,2) = [((6,6,1,true),[SOME (5,5,~1,false)])]),
+    ("5.22", f4 [(4,4,1,false),(5,5,~1,false)] (4,4,1,false) (2,2) = [((4,4,1,false),(6,6,1,false),[SOME (5,5,~1,false)])]),
+    ("5.23", f4 [(4,4,1,true),(5,5,~1,false)] (4,4,1,true) (2,2) = [((4,4,1,true),(6,6,1,true),[SOME (5,5,~1,false)])]),
     
-    ("5.00", f4 [(4,4,1,false),(5,5,~1,true)] (5,5,~1,true) (~2,~2) = [((3,3,~1,true),[SOME (4,4,1,false)])]),
-    ("5.00", f4 [(4,4,1,false),(5,5,~1,false)] (5,5,~1,false) (~2,~2) = [((3,3,~1,false),[SOME (4,4,1,false)])]),
+    ("5.24", f4 [(4,4,1,false),(5,5,~1,true)] (5,5,~1,true) (~2,~2) = [((5,5,~1,true),(3,3,~1,true),[SOME (4,4,1,false)])]),
+    ("5.25", f4 [(4,4,1,false),(5,5,~1,false)] (5,5,~1,false) (~2,~2) = [((5,5,~1,false),(3,3,~1,false),[SOME (4,4,1,false)])]),
 
-    ("5.00", f4 [(4,4,1,true),(5,5,~1,true)] (5,5,~1,true) (~2,~2) = [((3,3,~1,true),[SOME (4,4,1,true)])]),
-    ("5.00", f4 [(4,4,1,true),(5,5,~1,false)] (5,5,~1,false) (~2,~2) = [((3,3,~1,false),[SOME (4,4,1,true)])]),
+    ("5.26", f4 [(4,4,1,true),(5,5,~1,true)] (5,5,~1,true) (~2,~2) = [((5,5,~1,true),(3,3,~1,true),[SOME (4,4,1,true)])]),
+    ("5.27", f4 [(4,4,1,true),(5,5,~1,false)] (5,5,~1,false) (~2,~2) = [((5,5,~1,false),(3,3,~1,false),[SOME (4,4,1,true)])]),
 
     (*Distant Captures*)
-    ("5.00", f4 [(1,1,~1,true),(5,5,1,true)] (1,1,~1,true) (5,5) = [((6,6,~1,true),[SOME (5,5,1,true)])]),
-    ("5.00", f4 [(1,1,~1,true),(5,5,1,true)] (5,5,1,true) (~5,~5) = [((0,0,1,true),[SOME (1,1,~1,true)])]),
+    ("5.30", f4 [(1,1,~1,true),(5,5,1,true)] (1,1,~1,true) (5,5) = [((1,1,~1,true),(6,6,~1,true),[SOME (5,5,1,true)])]),
+    ("5.31", f4 [(1,1,~1,true),(5,5,1,true)] (5,5,1,true) (~5,~5) = [((5,5,1,true),(0,0,1,true),[SOME (1,1,~1,true)])]),
 
     (*Distant Captures with far landing*)
-    ("5.00", f4 [(1,1,~1,true),(5,5,1,true)] (1,1,~1,true) (6,6) = [((7,7,~1,true),[SOME (5,5,1,true)])]),
-    ("5.00", f4 [(3,3,~1,true),(5,5,1,true)] (5,5,1,true) (~5,~5) = [((0,0,1,true),[SOME (3,3,~1,true)])]) 
+    ("5.40", f4 [(1,1,~1,true),(5,5,1,true)] (1,1,~1,true) (6,6) = [((1,1,~1,true),(7,7,~1,true),[SOME (5,5,1,true)])]),
+    ("5.41", f4 [(3,3,~1,true),(5,5,1,true)] (5,5,1,true) (~5,~5) = [((5,5,1,true),(0,0,1,true),[SOME (3,3,~1,true)])]) 
 
 ];
 print ("\n"^Int.toString(List.length(tests))^" TOTAL TESTS RUN----------------------"^name_hw^"--------------------------\n"); (*Name display to assert correct test file is running*)
