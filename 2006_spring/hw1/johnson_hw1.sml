@@ -37,7 +37,7 @@ exception IllegalConfig and
 	  ImpossibleError2 and
 	  ImpossibleError3 
 	      
-fun legal_move c (p as (px,py,ps,pk))  (d as (dx,dy)) =
+fun legal_move_core c (p as (px,py,ps,pk))  (d as (dx,dy)) =
   let val moved as (mx,my) = (px+dx,px+dy)
       val atomicStep as (ax,ay) = (dx div abs(dx), dy div abs(dy)) handle Div => raise ZeroMove
       (*val printer = (print ("\n p: ("^(Int.toString(px))^","^(Int.toString(py))^") d: ("^(Int.toString(dx))^","^(Int.toString(dy))^")"))*)
@@ -80,8 +80,10 @@ fun legal_move c (p as (px,py,ps,pk))  (d as (dx,dy)) =
 															   
        | true  => if isSlide then [((mx,my,ps,pk),[])] else
 		  if length rangeOfSteps = 0 then raise ImpossibleError2 else (*Impossible as handled by ZeroMove and RangeOfStepsAnomaly above*)
-		  if isJump then [((mx,my,ps,pk),[enemyCoord])] else raise ImpossibleError3
-  end handle _ => []
+		  if isJump then [((mx,my,ps,pk),[enemyCoord])] else raise ImpossibleError3 (*If it is not isSlide then piecesInbetween has to be 1 as more than one is handled above by MultiplePiecesI                                                                                             nterspersing. Also, since it is not isSlide, then rangeOfSteps has to be at least two as negative is an imp                                                                                             ossible listlength and as 0 is handled above by RangeOfStepAnomaly and 1 is denied by it not being isSlide*)
+  end
+
+fun legal_move c (p as (px,py,ps,pk)) (d as (dx,dy)) = legal_move c p d handle _ => []
 
 fun all_single_moves [] _ = []
   | all_single_moves c r0 =
@@ -144,7 +146,7 @@ fun f2_f c = legal_config c = false;
 fun f3_t c p = piece_at c p <>NONE;
 fun f3_f c p = piece_at c p = NONE;
 
-val f4 = legal_move;
+val f4 = legal_move_core;
 
 (*Unit tests are of format string*bool where bool is represented by evaluation of a function to an expected value*)
 val tests = [
