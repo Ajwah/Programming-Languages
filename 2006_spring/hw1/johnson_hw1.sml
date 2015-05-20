@@ -40,6 +40,7 @@ exception IllegalConfig and
 fun legal_move c (p as (px,py,ps,pk))  (d as (dx,dy)) =
   let val moved as (mx,my) = (px+dx,px+dy)
       val atomicStep as (ax,ay) = (dx div abs(dx), dy div abs(dy)) handle Div => raise ZeroMove
+      (*val printer = (print ("\n p: ("^(Int.toString(px))^","^(Int.toString(py))^") d: ("^(Int.toString(dx))^","^(Int.toString(dy))^")"))*)
       val assert_LegalConfig = if legal_config c then true else raise IllegalConfig
       val assert_PlausibleMove = if abs(dx) = abs(dy) then true else raise ImplausibleMove
       val assert_BoardRange = if (mx> ~1 andalso mx<maxX andalso my> ~1 andalso my<maxY) then true else raise OutOfBoardRange
@@ -80,8 +81,25 @@ fun legal_move c (p as (px,py,ps,pk))  (d as (dx,dy)) =
        | true  => if isSlide then [((mx,my,ps,pk),[])] else
 		  if length rangeOfSteps = 0 then raise ImpossibleError2 else (*Impossible as handled by ZeroMove and RangeOfStepsAnomaly above*)
 		  if isJump then [((mx,my,ps,pk),[enemyCoord])] else raise ImpossibleError3
-  end
+  end handle _ => []
 
+fun all_single_moves [] _ = []
+  | all_single_moves c r0 =
+    let val pl_lst = List.filter (fn(_,_,r,_)=>r=r0) c
+	val (kings,men) = List.partition (fn(_,_,_,k)=>k=true) pl_lst
+	fun helper e r s = legal_move c e (s, s*r) @ legal_move c e (~s, s*r)
+	fun handle_men [] = []
+	  | handle_men (m::ms') = helper m r0 1 @ helper m r0 2 @ handle_men ms'
+	fun handle_kings [] = []
+	  | handle_kings (k::ks') =
+	    let fun loop 0 = handle_kings ks'
+		  | loop n = helper k 1 n @ helper k ~1 n @ loop (n-1)
+	    in loop 7
+	    end
+    in handle_men men @ handle_kings kings
+    end
+						 
+      
 val name_hw = "2006 - Spring - Assignment One: Checkers";
 
 val p0 = (0,0,1,true) and q0 =(0,0);
