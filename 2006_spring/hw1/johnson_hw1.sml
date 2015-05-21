@@ -48,7 +48,7 @@ fun legal_move_core c (p as (px,py,ps,pk))  (d as (dx,dy)) =
 						if ps=1 then dy=abs(dy) else dy<>abs(dy)
 					    else true
       val assert_CorrectPlayingDirection = if isCorrectPlayingDirectionHelper then true else raise IncorrectPlayingDirection
-      val assert_DestinationOccupied = if piece_at c moved = NONE then false else raise DestinationOccupied
+      val assert_DestinationNotOccupied = if piece_at c moved = NONE then false else raise DestinationOccupied
       val assert_P_in_C = if List.exists (fn(e)=>e=p) c then true else raise PieceNotPresent
 		      							
       fun createSteppingRange (step as (x,y)) acc counterOccupied (enemyCoord: (int*int*int*bool) option) = 
@@ -100,8 +100,25 @@ fun all_single_moves [] _ = []
 	    end
     in handle_men men @ handle_kings kings
     end
-						 
-      
+
+exception CaptureNotPresent
+fun update_board [] _ = []
+  | update_board c (sp as startingPiece, ep as endingPiece as (epx,epy,_,_), lc as listOfCaptures) =
+    let val d as impossible_dummy_piece =  (~1,~1,100,false)
+	val cp as captured_piece = case lc of [] => d
+					    | [SOME p] => p
+	val assert_LegalConfig = if legal_config c then true else raise IllegalConfig
+	val assert_PiecePresent = if List.exists (fn(e)=>e=sp) c then true else raise PieceNotPresent
+	val assert_DestinationNotOccupied = if piece_at c (epx,epy) = NONE then true else raise DestinationOccupied
+	val assert_BoardRange = if legal_piece ep then true else raise OutOfBoardRange
+	val assert_CapturePresent = if cp <> d then
+					if List.exists (fn(e)=>e=cp) c then true else raise CaptureNotPresent
+				    else true
+					     
+	val updated = List.filter (fn(e)=>e<>sp andalso e<>cp) c
+    in add_piece updated ep
+    end
+	
 val name_hw = "2006 - Spring - Assignment One: Checkers";
 
 val p0 = (0,0,1,true) and q0 =(0,0);
