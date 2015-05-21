@@ -81,9 +81,9 @@ fun legal_move_core c (p as (px,py,ps,pk))  (d as (dx,dy)) =
        | true  => if isSlide then [(p,(mx,my,ps,pk),[])] else
 		  if length rangeOfSteps = 0 then raise ImpossibleError2 else (*Impossible as handled by ZeroMove and RangeOfStepsAnomaly above*)
 		  if isJump then [(p,(mx,my,ps,pk),[enemyCoord])] else raise ImpossibleError3 (*If it is not isSlide then piecesInbetween has to be 1 as more than one is handled above by MultiplePiecesI                                                                                             nterspersing. Also, since it is not isSlide, then rangeOfSteps has to be at least two as negative is an imp                                                                                             ossible listlength and as 0 is handled above by RangeOfStepAnomaly and 1 is denied by it not being isSlide*)
-  end
+  end 
 
-fun legal_move c (p as (px,py,ps,pk)) (d as (dx,dy)) = legal_move c p d handle _ => []
+fun legal_move c p d = legal_move_core c p d handle _ => []
 
 fun all_single_moves [] _ = []
   | all_single_moves c r0 =
@@ -101,8 +101,8 @@ fun all_single_moves [] _ = []
     in handle_men men @ handle_kings kings
     end
 
-exception CaptureNotPresent
-fun update_board [] _ = []
+exception CaptureNotPresent and EmptyBoard
+fun update_board [] _ = raise EmptyBoard
   | update_board c (sp as startingPiece, ep as endingPiece as (epx,epy,_,_), lc as listOfCaptures) =
     let val d as impossible_dummy_piece =  (~1,~1,100,false)
 	val cp as captured_piece = case lc of [] => d
@@ -117,6 +117,16 @@ fun update_board [] _ = []
 					     
 	val updated = List.filter (fn(e)=>e<>sp andalso e<>cp) c
     in add_piece updated ep
+    end
+
+fun single_captures_by_p [] p = raise EmptyBoard
+  | single_captures_by_p c (p as (_,_,pr,_)) =
+    let val em as every_possible_move_on_board = all_single_moves c pr
+	val captures_by_p = List.filter (fn(sp,_,lc)=> case lc of
+							   [] => false
+							 | [SOME piece] => p = sp
+					) em
+    in captures_by_p
     end
 	
 val name_hw = "2006 - Spring - Assignment One: Checkers";
