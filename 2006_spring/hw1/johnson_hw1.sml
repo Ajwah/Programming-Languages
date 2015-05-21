@@ -1,5 +1,25 @@
 val maxX = 8
 val maxY = 8
+
+fun draw_board c =
+  let fun loop x y =
+	let (*val printxy = (print ("\n "^(Int.toString(x))^","^(Int.toString(y))))*)
+	    val isP = List.find (fn(px,py,pr,pk) => px=x andalso py=y) c
+	    val b as block = case isP of
+				 NONE => if on_board (x,y) then "#" else " "
+			       | SOME (_,_,pr,pk) => case (pr,pk) of
+							 (1,false) => "o"
+						       | (1,true) => "O"
+						       | (~1,false) => "x"
+						       | (~1,true) => "X"
+	    val isNewLine = x=maxX-1
+	    val isLastLine = y<0
+	    val next = if isLastLine then "" else b ^ (if isNewLine then "\n"^ loop 0 (y-1) else loop (x+1) y)
+	in next
+	end
+  in loop 0 (maxY-1)
+  end	       
+	       
 fun add_piece c p = p :: c
 fun on_board (x,y) = let val t1 = x mod 2 = 0
 			 val t2 = y mod 2 = 0
