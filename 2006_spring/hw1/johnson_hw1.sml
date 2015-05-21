@@ -1,17 +1,26 @@
 val maxX = 8
 val maxY = 8
+	       
+fun draw_piece (p as (_,_,pr,pk))  =
+  case (pr,pk) of
+      (1,false) => "o"
+    | (1,true) => "O"
+    | (~1,false) => "x"
+    | (~1,true) => "X"
 
+fun convert2str (p as (px,py,pr,pk)) =
+  let val repr = draw_piece p
+      val coord = " ("^Int.toString(px)^","^Int.toString(px)^")"
+  in repr^coord
+  end
+		       
 fun draw_board c =
   let fun loop x y =
 	let (*val printxy = (print ("\n "^(Int.toString(x))^","^(Int.toString(y))))*)
 	    val isP = List.find (fn(px,py,pr,pk) => px=x andalso py=y) c
-	    val b as block = case isP of
-				 NONE => if on_board (x,y) then "#" else " "
-			       | SOME (_,_,pr,pk) => case (pr,pk) of
-							 (1,false) => "o"
-						       | (1,true) => "O"
-						       | (~1,false) => "x"
-						       | (~1,true) => "X"
+	    val b as block =  case isP of
+				  NONE => if on_board (x,y) then "#" else " "
+			       |  SOME p => draw_piece p
 	    val isNewLine = x=maxX-1
 	    val isLastLine = y<0
 	    val next = if isLastLine then "" else b ^ (if isNewLine then "\n"^ loop 0 (y-1) else loop (x+1) y)
@@ -19,7 +28,6 @@ fun draw_board c =
 	end
   in loop 0 (maxY-1)
   end	       
-
       
 fun magnify_board b (mf as magnifying_factor)=
   let val t2lc as transform_string_to_list_chars = explode b 
@@ -45,7 +53,7 @@ fun magnify_board b (mf as magnifying_factor)=
 	    val isLastLine = y=maxY-1 andalso isNewCycle
 	    val i = if isNewCycle then 0 else r
 	    val cy as current_y = if isNewCycle then y + 1 else y
-	in if isLastLine then "\n" else cs ^ (if isNewLine then "\n"^ loop 0 cy i else loop (x+1) cy i)
+	in if isLastLine then "\n\n\n\n\n" else cs ^ (if isNewLine then "\n"^ loop 0 cy i else loop (x+1) cy i)
 	end
   in loop 0 0 0
   end;
@@ -184,15 +192,21 @@ fun single_captures_by_p [] p = raise EmptyBoard
 	
 fun all_captures_by_p [] _ = raise EmptyBoard
   | all_captures_by_p c (p as (_,_,pr,_)) =
-    let val lpc as possible_captures_by_p = single_captures_by_p c p
+    let 
+	val lpc as possible_captures_by_p = single_captures_by_p c p
 	val lpu as possible_updates_of_c = List.map (fn(s as state)=> update_board c s) lpc
 	fun loop [] [] = []
-	  | loop ((pc as (sp,ep,lc))::lpc') (pu::lpu') = ((pc,pu) :: all_captures_by_p pu ep) @ loop lpc' lpu'
+	  | loop ((pc as (sp,ep,lc))::lpc') (pu::lpu') =
+	    let val _ = (print ("\n "^(convert2str sp)^" ==> "^(convert2str ep)^"\n"^magnify_board (draw_board pu) 1))
+	    in
+		((pc,pu) :: all_captures_by_p pu ep) @ loop lpc' lpu'
+	    end
     in loop lpc lpu
-    end
-	
-val name_hw = "2006 - Spring - Assignment One: Checkers";
+    end;
+all_captures_by_p [(3,3,~1,false),(2,2,1,false),(1,3,~1,false),(5,5,~1,false),(3,5,~1,false),(1,5,~1,false)] (2,2,1,false);
 
+val name_hw = "2006 - Spring - Assignment One: Checkers";
+val tests_required = false;
 val p0 = (0,0,1,true) and q0 =(0,0);
 val p1 = (1,1,1,false) and q1 = (1,1);
 val p2 = (2,2,~1,false) and q2 = (2,2);
@@ -355,7 +369,9 @@ val tests = [
     ("5.41", f4 [(3,3,~1,true),(5,5,1,true)] (5,5,1,true) (~5,~5) = [((5,5,1,true),(0,0,1,true),[SOME (3,3,~1,true)])]) 
 
 ];
-print ("\n"^Int.toString(List.length(tests))^" TOTAL TESTS RUN----------------------"^name_hw^"--------------------------\n"); (*Name display to assert correct test file is running*)
+if tests_required then
+    print ("\n"^Int.toString(List.length(tests))^" TOTAL TESTS RUN----------------------"^name_hw^"--------------------------\n") (*Name display to assert correct test file is running*)
+else print ("\n ALL TESTS SKIPPED"^" ---------------------"^name_hw^"--------------------------\n");
 fun all_tests(tests) =
   let fun helper(tests: (string*bool) list, all_passed) = 
 	case tests of
@@ -365,7 +381,9 @@ fun all_tests(tests) =
   in
       helper(tests, true)
   end;
- 
-case all_tests(tests) of
-    true => print "--------------EVERY TESTS PASSED-------------\n"
-  | false => print "--------------SOMETHING IS WRONG-------------------------\n";
+
+if tests_required then
+    case all_tests(tests) of
+	true => print "--------------EVERY TESTS PASSED-------------\n"
+      | false => print "--------------SOMETHING IS WRONG-------------------------\n"
+else print ""
