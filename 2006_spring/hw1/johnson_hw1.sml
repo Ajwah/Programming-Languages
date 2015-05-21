@@ -19,7 +19,40 @@ fun draw_board c =
 	end
   in loop 0 (maxY-1)
   end	       
-	       
+
+      
+fun magnify_board b (mf as magnifying_factor)=
+  let val t2lc as transform_string_to_list_chars = explode b 
+      val enc as eliminate_newline_chars = List.filter (fn(e)=> e <> #"\n") t2lc
+      val g8x8 as group_by_eight_X_eight = rev (#1 (List.foldl (fn(e,(acc,tmp,i))=> if i = maxX-1 then ((tmp@[e])::acc,[],0) else (acc,tmp@[e],i+1)) ([],[],0) enc))
+      fun multiply_s s 0 = ""
+	| multiply_s s n = s^(multiply_s s (n-1)) 
+      fun loop x y m =
+	let val cl as current_list = List.nth(g8x8,y)
+	    val cc as current_char = List.nth(cl,x)
+	    val cse as current_selection = case cc of
+					       #" " => " "
+					     | #"#" => "█"
+					     | #"o" => "o"
+					     | #"O" => "O"
+					     | #"x" => "x"
+					     | #"X" => "X"
+							   
+	    val cs as current_string = multiply_s cse (mf * 2)
+	    val isNewLine = x=maxX-1
+	    val r = if isNewLine then m+1 else m
+	    val isNewCycle = r=mf
+	    val isLastLine = y=maxY-1 andalso isNewCycle
+	    val i = if isNewCycle then 0 else r
+	    val cy as current_y = if isNewCycle then y + 1 else y
+	in if isLastLine then "\n" else cs ^ (if isNewLine then "\n"^ loop 0 cy i else loop (x+1) cy i)
+	end
+  in loop 0 0 0
+  end;
+
+val t1 = magnify_board (draw_board []) 7;
+val t2 = magnify_board (draw_board c30) 7;
+
 fun add_piece c p = p :: c
 fun on_board (x,y) = let val t1 = x mod 2 = 0
 			 val t2 = y mod 2 = 0
