@@ -129,6 +129,15 @@ fun single_captures_by_p [] p = raise EmptyBoard
     in captures_by_p
     end
 	
+fun all_captures_by_p [] _ = raise EmptyBoard
+  | all_captures_by_p c (p as (_,_,pr,_)) =
+    let val lpc as possible_captures_by_p = single_captures_by_p c p
+	val lpu as possible_updates_of_c = List.map (fn(s as state)=> update_board c s) lpc
+	fun loop [] [] = []
+	  | loop ((pc as (sp,ep,lc))::lpc') (pu::lpu') = ((pc,pu) :: all_captures_by_p pu ep) @ loop lpc' lpu'
+    in loop lpc lpu
+    end
+	
 val name_hw = "2006 - Spring - Assignment One: Checkers";
 
 val p0 = (0,0,1,true) and q0 =(0,0);
