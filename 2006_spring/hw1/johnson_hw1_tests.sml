@@ -32,7 +32,7 @@ val c53 = [p4,p7,p0,p2,p1,p6,p1];
 
 val c6 = c30 @ c30 @ c30 @ c30 @ c30 @ c30 @ c30 (*Multiple Duplicates*)
 
-val d as dummy = [((~1,~1,5,true),(~1,~1,5,true),[NONE])];
+val d as dummy = [((~1,~1,5,true),(~1,~1,5,true),NONE)];
 
 fun f1_t p = legal_piece p = true;
 fun f1_f p = legal_piece p = false;
@@ -127,39 +127,39 @@ val tests = [
     ("4.100", f4 [p1,p2] p1 (5,5) = d handle OnlyTwoStepJump => true),
 
     (*Different legal moves without capture*)
-    ("5.00", f4 [p0] p0 (1,1) = [(p0,(1,1,1,true),[])]),                            (*Legal moves on part of King*)
-    ("5.01", f4 [p0] p0 (5,5) = [(p0,(5,5,1,true),[])]),
-    ("5.02", f4 [(5,5,1,true)] (5,5,1,true) (~1,~1) = [((5,5,1,true),(4,4,1,true),[])]),
-    ("5.03", f4 [(5,5,1,true)] (5,5,1,true) (~5,~5) = [((5,5,1,true),(0,0,1,true),[])]),
-    ("5.04", f4 [(5,5,1,true)] (5,5,1,true) (~1,1) = [((5,5,1,true),(4,6,1,true),[])]),
-    ("5.05", f4 [(5,5,1,true)] (5,5,1,true) (1,~1) = [((5,5,1,true),(6,4,1,true),[])]),
+    ("5.00", f4 [p0] p0 (1,1) = [(p0,(1,1,1,true),NONE)]),                            (*Legal moves on part of King*)
+    ("5.01", f4 [p0] p0 (5,5) = [(p0,(5,5,1,true),NONE)]),
+    ("5.02", f4 [(5,5,1,true)] (5,5,1,true) (~1,~1) = [((5,5,1,true),(4,4,1,true),NONE)]),
+    ("5.03", f4 [(5,5,1,true)] (5,5,1,true) (~5,~5) = [((5,5,1,true),(0,0,1,true),NONE)]),
+    ("5.04", f4 [(5,5,1,true)] (5,5,1,true) (~1,1) = [((5,5,1,true),(4,6,1,true),NONE)]),
+    ("5.05", f4 [(5,5,1,true)] (5,5,1,true) (1,~1) = [((5,5,1,true),(6,4,1,true),NONE)]),
 
-    ("5.10", f4 [(5,5,1,false)] (5,5,1,false) (~1,1) = [((5,5,1,false),(4,6,1,false),[])]),    (*Legal Moves on part of Man 1 and ~1 respectively*)
-    ("5.11", f4 [(5,5,1,false)] (5,5,1,false) (1,1) = [((5,5,1,false),(6,6,1,false),[])]),
-    ("5.12", f4 [(5,5,~1,false)] (5,5,~1,false) (~1,~1) = [((5,5,~1,false),(4,4,~1,false),[])]),
-    ("5.13", f4 [(5,5,~1,false)] (5,5,~1,false) (1,~1) = [((5,5,~1,false),(6,4,~1,false),[])]),
+    ("5.10", f4 [(5,5,1,false)] (5,5,1,false) (~1,1) = [((5,5,1,false),(4,6,1,false),NONE)]),    (*Legal Moves on part of Man 1 and ~1 respectively*)
+    ("5.11", f4 [(5,5,1,false)] (5,5,1,false) (1,1) = [((5,5,1,false),(6,6,1,false),NONE)]),
+    ("5.12", f4 [(5,5,~1,false)] (5,5,~1,false) (~1,~1) = [((5,5,~1,false),(4,4,~1,false),NONE)]),
+    ("5.13", f4 [(5,5,~1,false)] (5,5,~1,false) (1,~1) = [((5,5,~1,false),(6,4,~1,false),NONE)]),
 
     (*Make different captures*)
     (*In proximity*)
-    ("5.20", f4 [(4,4,1,false),(5,5,~1,true)] (4,4,1,false) (2,2) = [((4,4,1,false),(6,6,1,false),[SOME (5,5,~1,true)])]),
-    ("5.21", f4 [(4,4,1,true),(5,5,~1,true)] (4,4,1,true) (2,2) = [((4,4,1,true),(6,6,1,true),[SOME (5,5,~1,true)])]),
+    ("5.20", f4 [(4,4,1,false),(5,5,~1,true)] (4,4,1,false) (2,2) = [((4,4,1,false),(6,6,1,false),SOME (5,5,~1,true))]),
+    ("5.21", f4 [(4,4,1,true),(5,5,~1,true)] (4,4,1,true) (2,2) = [((4,4,1,true),(6,6,1,true),SOME (5,5,~1,true))]),
     
-    ("5.22", f4 [(4,4,1,false),(5,5,~1,false)] (4,4,1,false) (2,2) = [((4,4,1,false),(6,6,1,false),[SOME (5,5,~1,false)])]),
-    ("5.23", f4 [(4,4,1,true),(5,5,~1,false)] (4,4,1,true) (2,2) = [((4,4,1,true),(6,6,1,true),[SOME (5,5,~1,false)])]),
+    ("5.22", f4 [(4,4,1,false),(5,5,~1,false)] (4,4,1,false) (2,2) = [((4,4,1,false),(6,6,1,false),SOME (5,5,~1,false))]),
+    ("5.23", f4 [(4,4,1,true),(5,5,~1,false)] (4,4,1,true) (2,2) = [((4,4,1,true),(6,6,1,true),SOME (5,5,~1,false))]),
     
-    ("5.24", f4 [(4,4,1,false),(5,5,~1,true)] (5,5,~1,true) (~2,~2) = [((5,5,~1,true),(3,3,~1,true),[SOME (4,4,1,false)])]),
-    ("5.25", f4 [(4,4,1,false),(5,5,~1,false)] (5,5,~1,false) (~2,~2) = [((5,5,~1,false),(3,3,~1,false),[SOME (4,4,1,false)])]),
+    ("5.24", f4 [(4,4,1,false),(5,5,~1,true)] (5,5,~1,true) (~2,~2) = [((5,5,~1,true),(3,3,~1,true),SOME (4,4,1,false))]),
+    ("5.25", f4 [(4,4,1,false),(5,5,~1,false)] (5,5,~1,false) (~2,~2) = [((5,5,~1,false),(3,3,~1,false),SOME (4,4,1,false))]),
 
-    ("5.26", f4 [(4,4,1,true),(5,5,~1,true)] (5,5,~1,true) (~2,~2) = [((5,5,~1,true),(3,3,~1,true),[SOME (4,4,1,true)])]),
-    ("5.27", f4 [(4,4,1,true),(5,5,~1,false)] (5,5,~1,false) (~2,~2) = [((5,5,~1,false),(3,3,~1,false),[SOME (4,4,1,true)])]),
+    ("5.26", f4 [(4,4,1,true),(5,5,~1,true)] (5,5,~1,true) (~2,~2) = [((5,5,~1,true),(3,3,~1,true),SOME (4,4,1,true))]),
+    ("5.27", f4 [(4,4,1,true),(5,5,~1,false)] (5,5,~1,false) (~2,~2) = [((5,5,~1,false),(3,3,~1,false),SOME (4,4,1,true))]),
 
     (*Distant Captures*)
-    ("5.30", f4 [(1,1,~1,true),(5,5,1,true)] (1,1,~1,true) (5,5) = [((1,1,~1,true),(6,6,~1,true),[SOME (5,5,1,true)])]),
-    ("5.31", f4 [(1,1,~1,true),(5,5,1,true)] (5,5,1,true) (~5,~5) = [((5,5,1,true),(0,0,1,true),[SOME (1,1,~1,true)])]),
+    ("5.30", f4 [(1,1,~1,true),(5,5,1,true)] (1,1,~1,true) (5,5) = [((1,1,~1,true),(6,6,~1,true),SOME (5,5,1,true))]),
+    ("5.31", f4 [(1,1,~1,true),(5,5,1,true)] (5,5,1,true) (~5,~5) = [((5,5,1,true),(0,0,1,true),SOME (1,1,~1,true))]),
 
     (*Distant Captures with far landing*)
-    ("5.40", f4 [(1,1,~1,true),(5,5,1,true)] (1,1,~1,true) (6,6) = [((1,1,~1,true),(7,7,~1,true),[SOME (5,5,1,true)])]),
-    ("5.41", f4 [(3,3,~1,true),(5,5,1,true)] (5,5,1,true) (~5,~5) = [((5,5,1,true),(0,0,1,true),[SOME (3,3,~1,true)])]) 
+    ("5.40", f4 [(1,1,~1,true),(5,5,1,true)] (1,1,~1,true) (6,6) = [((1,1,~1,true),(7,7,~1,true),SOME (5,5,1,true))]),
+    ("5.41", f4 [(3,3,~1,true),(5,5,1,true)] (5,5,1,true) (~5,~5) = [((5,5,1,true),(0,0,1,true),SOME (3,3,~1,true))]) 
 
 ];
 print ("\n"^Int.toString(List.length(tests))^" TOTAL TESTS RUN----------------------"^name_hw^"--------------------------\n"); (*Name display to assert correct test file is running*)
@@ -177,4 +177,3 @@ fun all_tests(tests) =
 case all_tests(tests) of
     true => print "--------------EVERY TESTS PASSED-------------\n"
   | false => print "--------------SOMETHING IS WRONG-------------------------\n"
-
