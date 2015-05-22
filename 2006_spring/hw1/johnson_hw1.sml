@@ -34,7 +34,9 @@ fun convert2str (p as (px,py,pr,pk)) =
       val coord = " ("^Int.toString(px)^","^Int.toString(py)^")"
   in repr^coord
   end
-		       
+
+fun toStr ((sp,ep,_),_) = convert2str sp ^" => "^convert2str ep
+      
 fun draw_board c =
   let fun loop x y =
 	let (*val printxy = (print ("\n "^(Int.toString(x))^","^(Int.toString(y))))*)
@@ -198,13 +200,65 @@ fun all_captures_by_p [] _ = raise EmptyBoard
 	    let val pri = List.foldl (fn(e,acc)=> acc ^"\n"^ (convert2str e)) "" pu
 		val _ = (print ("\n "^(convert2str sp)^" ==> "^(convert2str ep)^" Captured Piece: "^(convert2str (valOf lc))^"\n"^(magnify_board (draw_board pu) 2)^pri))
 	    in
-		((pc,pu) :: all_captures_by_p pu ep) @ loop lpc' lpu'
+		((pc,pu) :: loop lpc' lpu') @ (all_captures_by_p pu ep)
 	    end
     in loop lpc lpu
     end;
 
-(*print (magnify_board (draw_board [(3,3,~1,false),(2,2,1,false),(1,3,~1,false),(5,5,~1,false),(3,5,~1,false),(1,5,~1,false)]) 1);*)
-all_captures_by_p [(3,3,~1,false),(2,2,1,false),(1,3,~1,false),(5,5,~1,false),(3,5,~1,false),(1,5,~1,false)] (2,2,1,false);
+fun sort_them c =
+  let val d_l as different_lengths = List.foldl (fn(((_,_,_),board),acc)=> let val l = length board   
+									   in if List.exists (fn(l')=>l'=l) acc then acc else l :: acc
+									   end)
+						[] c (* Output: [1,2,3,4,5] where each number corresponds to amount pieces on a board in differnt boards under c *)
+      val b_a_p as by_amount_pieces = List.map (fn(l)=> List.filter (fn((_,_,_),board)=> length board=l) c) d_l (*Sort c according to different board lengths above, eg [1,2,3,4,5]*)
+      val d_sp as different_starting_points = List.foldl (fn(((sp,_,_),_),acc)=> if List.exists (fn(sp')=>sp'=sp) acc then acc else sp :: acc)
+							 [] (*Output : ((sp,ep,cp),board) => [sp1,sp2,sp3,..] 
+							     Create a list of all the different starting points for a given list l*)
+      fun branch (ml::ml'::mls') acc =
+	let val b_csp as by_common_starting_points = List.foldl (fn(sp,acc)=>
+								    (List.foldl (fn(e,acc)=>[e]::acc)
+										[]
+										(List.filter (fn((sp',_,_),_)=> sp'=sp) ml))@acc)
+								[]
+								(d_sp ml) (*Create a list of lists where every sub list occupies *)
+	    val pair_ups as (pass,fail) = List.partition (fn((_,ep,_),_)=> List.exists (fn((sp,_,_),_)=> ep = sp) ml) ml'
+	    val _ = List.map (fn([p as ((sp,ep,cp),b)])=> (print ("\n "^toStr p^"\n"^draw_board b);p)) b_csp
+	in (ml,b_csp)
+	end
+  in (branch b_a_p [])
+  end
+      
+fun sort_captures (lc as (c as ((sp,ep,_),board))::cs') = 
+    let fun collect_corresponding_to (c as ((csp,_,_),bc)) ls = c :: List.filter (fn((a_move as (msp,mep,_),bm))=>(print ("\n"^(convert2str msp)^" ==> "^(convert2str mep)); msp=csp andalso length bc = length bm)) ls
+	val zero = collect_corresponding_to c cs'
+	val first = List.map (fn(p as ((_,ep,_),bp))=> (print ("\n branch: "^toStr p^": ");
+							List.foldl (fn(q as ((sp,_,_),bq),acc)=>if sp=ep andalso length bp - length bq = 1
+											       then (print (" "^toStr q^" | ");
+												     q::acc)
+											       else acc)
+								  []
+								  cs'
+						      )
+			     ) zero
+(*	val second = List.map (fn(p as ((_,ep,_),bp))=> (print ("\n branch: "^toStr p^": ");
+							List.foldl (fn(q as ((sp,_,_),bq),acc)=>if sp=ep andalso length bp - length bq = 1
+											       then (print (" "^toStr q^" | ");
+												     q::acc)
+											       else acc)
+								  []
+								  cs'
+						      )
+			     ) first *)
+    in (zero,first)
+    end;
 
+(*print (magnify_board (draw_board [(3,3,~1,false),(2,2,1,false),(1,3,~1,false),(5,5,~1,false),(3,5,~1,false),(1,5,~1,false)]) 1);*)
+val t = all_captures_by_p [(3,3,~1,false),(2,2,1,true),(1,3,~1,false),(5,5,~1,false),(3,5,~1,false),(1,5,~1,false)] (2,2,1,true);
+val q = #2 (sort_them t);
+val w = hd q;
+val e = hd w;
+
+(*
 print (magnify_board (draw_board [(0,4,1,false),(3,3,~1,false),(5,5,~1,false),(3,5,~1,false),(1,5,~1,false)]) 7);
 single_captures_by_p [(0,4,1,false),(3,3,~1,false),(5,5,~1,false),(3,5,~1,false),(1,5,~1,false)] (0,4,1,false);
+*)
