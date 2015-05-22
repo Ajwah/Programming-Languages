@@ -10,7 +10,7 @@ fun draw_piece (p as (_,_,pr,pk))  =
 
 fun convert2str (p as (px,py,pr,pk)) =
   let val repr = draw_piece p
-      val coord = " ("^Int.toString(px)^","^Int.toString(px)^")"
+      val coord = " ("^Int.toString(px)^","^Int.toString(py)^")"
   in repr^coord
   end
 		       
@@ -53,7 +53,7 @@ fun magnify_board b (mf as magnifying_factor)=
 	    val isLastLine = y=maxY-1 andalso isNewCycle
 	    val i = if isNewCycle then 0 else r
 	    val cy as current_y = if isNewCycle then y + 1 else y
-	in if isLastLine then "\n\n\n\n\n" else cs ^ (if isNewLine then "\n"^ loop 0 cy i else loop (x+1) cy i)
+	in if isLastLine then "" else cs ^ (if isNewLine then "\n"^ loop 0 cy i else loop (x+1) cy i)
 	end
   in loop 0 0 0
   end;
@@ -99,7 +99,7 @@ exception IllegalConfig and
 	  ImpossibleError3 
 	      
 fun legal_move_core c (p as (px,py,ps,pk))  (d as (dx,dy)) =
-  let val moved as (mx,my) = (px+dx,px+dy)
+  let val moved as (mx,my) = (px+dx,py+dy)
       val atomicStep as (ax,ay) = (dx div abs(dx), dy div abs(dy)) handle Div => raise ZeroMove
       (*val printer = (print ("\n p: ("^(Int.toString(px))^","^(Int.toString(py))^") d: ("^(Int.toString(dx))^","^(Int.toString(dy))^")"))*)
       val assert_LegalConfig = if legal_config c then true else raise IllegalConfig
@@ -192,15 +192,21 @@ fun single_captures_by_p [] p = raise EmptyBoard
 	
 fun all_captures_by_p [] _ = raise EmptyBoard
   | all_captures_by_p c (p as (_,_,pr,_)) =
-    let 
+    let val _ = (("\n Current_Board: \n"^magnify_board (draw_board c) 2))
 	val lpc as possible_captures_by_p = single_captures_by_p c p
 	val lpu as possible_updates_of_c = List.map (fn(s as state)=> update_board c s) lpc
 	fun loop [] [] = []
 	  | loop ((pc as (sp,ep,lc))::lpc') (pu::lpu') =
-	    let val _ = (print ("\n "^(convert2str sp)^" ==> "^(convert2str ep)^"\n"^magnify_board (draw_board pu) 1))
+	    let val pri = List.foldl (fn(e,acc)=> acc ^"\n"^ (convert2str e)) "" pu
+		val _ = (print ("\n "^(convert2str sp)^" ==> "^(convert2str ep)^" Captured Piece: "^(convert2str (valOf (hd lc)))^"\n"^(magnify_board (draw_board pu) 2)^pri))
 	    in
 		((pc,pu) :: all_captures_by_p pu ep) @ loop lpc' lpu'
 	    end
     in loop lpc lpu
     end;
+
+(*print (magnify_board (draw_board [(3,3,~1,false),(2,2,1,false),(1,3,~1,false),(5,5,~1,false),(3,5,~1,false),(1,5,~1,false)]) 1);*)
 all_captures_by_p [(3,3,~1,false),(2,2,1,false),(1,3,~1,false),(5,5,~1,false),(3,5,~1,false),(1,5,~1,false)] (2,2,1,false);
+
+print (magnify_board (draw_board [(0,4,1,false),(3,3,~1,false),(5,5,~1,false),(3,5,~1,false),(1,5,~1,false)]) 7);
+single_captures_by_p [(0,4,1,false),(3,3,~1,false),(5,5,~1,false),(3,5,~1,false),(1,5,~1,false)] (0,4,1,false);
