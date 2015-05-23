@@ -34,7 +34,10 @@ fun convert2str (p as (px,py,pr,pk)) =
       val coord = " ("^Int.toString(px)^","^Int.toString(py)^")"
   in repr^coord
   end
-		       
+
+fun toStr ((sp,ep,NONE),_) = convert2str sp ^" => "^convert2str ep^" Captured Piece: NONE"
+  | toStr ((sp,ep,SOME cp),_) = convert2str sp ^" => "^convert2str ep^ " Captured Piece: "^convert2str cp
+      
 fun draw_board c =
   let fun loop x y =
 	let (*val printxy = (print ("\n "^(Int.toString(x))^","^(Int.toString(y))))*)
@@ -232,6 +235,8 @@ fun sort_them c =
 								(d_sp ml) (*Create a list of lists where every sub list occupies *)
 	    val b_csp2 = List.foldl (fn(e,acc)=> [e]::acc) [] ml
 	    val pair_ups as (pass,fail) = List.partition (fn((_,ep,_),_)=> List.exists (fn((sp,_,_),_)=> ep = sp) ml) ml'
+	    val _ = List.map (fn([p as ((sp,ep,cp),b)])=> (print ("\n "^toStr p^"\n"^draw_board b);p)) b_csp2
+
 	in (b_a_p,b_csp2)
 	end
   in (branch b_a_p [])
