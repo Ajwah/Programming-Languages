@@ -214,8 +214,9 @@ fun all_captures_by_p [] _ = raise EmptyBoard
 
 datatype 'a tree = Branch of 'a option * 'a tree list | MBranch of 'a tree list
 
-fun i_MB (MBranch lst) n = MBranch (((Branch (SOME n,[]))::lst))								      
-fun i (MBranch lst) n =  List.map (fn(branch)=> i branch n) lst
+fun i_MB (MBranch lst) n = MBranch (((Branch (SOME n,[]))::lst))
+				   
+fun i (MBranch lst) n =  MBranch (List.map (fn(branch)=> i branch n) lst)
   | i (Branch (SOME (q as ((sq,eq,cq),bq)),ls)) (n as ((sp,ep,cp),bp)) =
     let val ls' = List.map (fn(branch)=> i branch n) ls
 	val diff as difference_in_amount_pieces_between_2_boards = (length bq) - (length bp)
@@ -228,6 +229,12 @@ fun i (MBranch lst) n =  List.map (fn(branch)=> i branch n) lst
 	  | (true,_) => Branch (SOME q, ls') 
     end
 
+	
+fun t2Str (Branch (NONE,_)) = "EMPTY BOARD"
+  | t2Str (Branch (SOME (q as ((sq,eq,cq),bq)),ls)) = "\n"^toStr q ^ "\n"^magnify_board (draw_board bq) 2 ^ (List.foldl (fn(p,acc)=> t2Str p ^ acc) "" ls)
+  | t2Str (MBranch lst) = (List.foldl (fn(e,acc)=> acc^ t2Str e) "\n\n\n Mother Branch: " lst) 
+
+	
 fun manage_captures c =
   let val d_l as different_lengths = List.foldl (fn(((_,_,_),board),acc)=> let val l = length board   
 									   in if List.exists (fn(l')=>l'=l) acc then acc else l :: acc
@@ -237,12 +244,10 @@ fun manage_captures c =
       val scl as starting_configurations_lst = List.last b_a_p
       val rcl as remainder_configurations_lst = List.concat (rev (List.take (b_a_p,length b_a_p -1)))
       val mother = List.foldl (fn(e,acc)=> i_MB acc e) (MBranch []) scl
-      val tree = List.foldl (fn(e,acc)=> i acc e) (Branch (NONE,[])) rcl
+      val _ = print (t2Str mother)
+      val tree = List.foldl (fn(e,acc)=> i acc e) (mother) rcl 
   in tree
   end
-
-fun t2Str (Branch (NONE,_)) = "EMPTY BOARD"
-  | t2Str (Branch (SOME (q as ((sq,eq,cq),bq)),ls)) = "\n"^toStr q ^ "\n"^magnify_board (draw_board bq) 2 ^ (List.foldl (fn(p,acc)=> t2Str p ^ acc) "" ls)
 
 
 ;
