@@ -222,6 +222,16 @@ fun i (Branch (NONE,_)) n = Branch (SOME n,[])
 	  | (true,_) => Branch (SOME q, ls') 
     end
 
+fun manage_captures c =
+  let val d_l as different_lengths = List.foldl (fn(((_,_,_),board),acc)=> let val l = length board   
+									   in if List.exists (fn(l')=>l'=l) acc then acc else l :: acc
+									   end)
+						[] c (* Output: [1,2,3,4,5] where each number corresponds to amount pieces on a board in differnt boards under c *)
+      val b_a_p as by_amount_pieces as (ml::ml'::mls') = List.map (fn(l)=> List.filter (fn((_,_,_),board)=> length board=l) c) d_l (*Sort c according to different board lengths above, eg [1,2,3,4,5]*)
+      val tree = List.foldl (fn(e,acc)=> i acc e) (Branch (NONE,[])) (List.concat (rev b_a_p))
+  in tree
+  end
+      
 
 ;
 
