@@ -38,7 +38,11 @@ fun convert2str (p as (px,py,pr,pk)) =
       val coord = " ("^Int.toString(px)^","^Int.toString(py)^")"
   in repr^coord
   end
-		       
+      
+fun toStr ((sp,ep,NONE),_) = convert2str sp ^" => "^convert2str ep^" Captured Piece: NONE"
+  | toStr ((sp,ep,SOME cp),_) = convert2str sp ^" => "^convert2str ep^ " Captured Piece: "^convert2str cp
+      
+      
 fun draw_board c =
   let fun loop x y =
 	let (*val printxy = (print ("\n "^(Int.toString(x))^","^(Int.toString(y))))*)
@@ -213,7 +217,7 @@ fun i (Branch (NONE,_)) n = Branch (SOME n,[])
   | i (Branch (SOME (q as ((sq,eq,cq),bq)),ls)) (n as ((sp,ep,cp),bp)) =
     let val ls' = List.map (fn(branch)=> i branch n) ls
 	val diff as difference_in_amount_pieces_between_2_boards = (length bq) - (length bp)
-	val cp_e_bq as is_captured_piece_element_board_q = is_on_board bq cp
+	val cp_e_bq as is_captured_piece_element_board_q = is_on_board bq cp (*Only in this case will it make sense to add the configuration as a direct subsequent branch of the current node*)
     in
 	case (eq=sp andalso cp_e_bq,diff) of
 	    (true,1) => Branch (SOME q,(Branch ((SOME n),[]))::ls')
@@ -231,9 +235,14 @@ fun manage_captures c =
       val tree = List.foldl (fn(e,acc)=> i acc e) (Branch (NONE,[])) (List.concat (rev b_a_p))
   in tree
   end
-      
+
+fun t2Str (Branch (NONE,_)) = "EMPTY BOARD"
+  | t2Str (Branch (SOME (q as ((sq,eq,cq),bq)),ls)) = "\n"^toStr q ^ "\n"^magnify_board (draw_board bq) 2 ^ (List.foldl (fn(p,acc)=> t2Str p ^ acc) "" ls)
+
 
 ;
 
 print (magnify_board (draw_board [(3,3,~1,false),(2,2,1,false),(1,3,~1,false),(5,5,~1,false),(3,5,~1,false),(1,5,~1,false)]) 1);
-all_captures_by_p [(3,3,~1,false),(2,2,1,false),(1,3,~1,false),(5,5,~1,false),(3,5,~1,false),(1,5,~1,false)] (2,2,1,false);
+val t = all_captures_by_p [(3,3,~1,false),(2,2,1,true),(1,3,~1,false),(5,5,~1,false),(3,5,~1,false),(1,5,~1,false)] (2,2,1,true);
+val z = (manage_captures t);
+val w = print (t2Str z);
