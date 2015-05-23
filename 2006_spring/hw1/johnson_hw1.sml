@@ -14,6 +14,10 @@ fun legal_piece (x,y,s,_) = (s = 1 orelse s = ~1) andalso on_board(x,y)
 fun piece_at [] _ = NONE
   | piece_at ((c as (cx,cy,_,_))::cs') (x,y) = if cx = x andalso cy = y then SOME c else piece_at cs' (x,y)
 
+
+fun is_on_board [] _ = false
+  | is_on_board _ NONE = false
+  | is_on_board (c::cs') (SOME p) = c = p orelse is_on_board cs' (SOME p)												  
 fun legal_config c =
     let fun isDuplicate [] _ = false
 	  | isDuplicate ((x,y,_,_)::ls') (p as (px,py,_,_)) = if px=x andalso py=y then true else isDuplicate ls' p
@@ -209,14 +213,17 @@ fun i (Branch (NONE,_)) n = Branch (SOME n,[])
   | i (Branch (SOME (q as ((sq,eq,cq),bq)),ls)) (n as ((sp,ep,cp),bp)) =
     let val ls' = List.map (fn(branch)=> i branch n) ls
 	val diff as difference_in_amount_pieces_between_2_boards = (length bq) - (length bp)
+	val cp_e_bq as is_captured_piece_element_board_q = is_on_board bq cp
     in
-	case (eq=sp,diff) of
+	case (eq=sp andalso cp_e_bq,diff) of
 	    (true,1) => Branch (SOME q,(Branch ((SOME n),[]))::ls')
 	  | (true,0) => Branch (SOME q, ls') (*Ignore duplicate*)
 	  | (false,_) => Branch (SOME q, ls') (*Ignore any later moves*)
 	  | (true,_) => Branch (SOME q, ls') 
-    end;
+    end
 
+
+;
 
 print (magnify_board (draw_board [(3,3,~1,false),(2,2,1,false),(1,3,~1,false),(5,5,~1,false),(3,5,~1,false),(1,5,~1,false)]) 1);
 all_captures_by_p [(3,3,~1,false),(2,2,1,false),(1,3,~1,false),(5,5,~1,false),(3,5,~1,false),(1,5,~1,false)] (2,2,1,false);
