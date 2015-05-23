@@ -243,4 +243,5 @@ fun sort_them c =
   end;
 
 print (magnify_board (draw_board [(3,3,~1,false),(2,2,1,false),(1,3,~1,false),(5,5,~1,false),(3,5,~1,false),(1,5,~1,false)]) 1);
-all_captures_by_p [(3,3,~1,false),(2,2,1,false),(1,3,~1,false),(5,5,~1,false),(3,5,~1,false),(1,5,~1,false)] (2,2,1,false);
+val t = all_captures_by_p [(3,3,~1,false),(2,2,1,true),(1,3,~1,false),(5,5,~1,false),(3,5,~1,false),(1,5,~1,false)] (2,2,1,true);
+val z = (sort_them t);
