@@ -203,8 +203,20 @@ fun all_captures_by_p [] _ = raise EmptyBoard
     in loop lpc lpu
     end;
 
-(*print (magnify_board (draw_board [(3,3,~1,false),(2,2,1,false),(1,3,~1,false),(5,5,~1,false),(3,5,~1,false),(1,5,~1,false)]) 1);*)
-all_captures_by_p [(3,3,~1,false),(2,2,1,false),(1,3,~1,false),(5,5,~1,false),(3,5,~1,false),(1,5,~1,false)] (2,2,1,false);
+datatype 'a tree = Branch of 'a option * 'a tree list;
 
-print (magnify_board (draw_board [(0,4,1,false),(3,3,~1,false),(5,5,~1,false),(3,5,~1,false),(1,5,~1,false)]) 7);
-single_captures_by_p [(0,4,1,false),(3,3,~1,false),(5,5,~1,false),(3,5,~1,false),(1,5,~1,false)] (0,4,1,false);
+fun i (Branch (NONE,_)) n = Branch (SOME n,[])
+  | i (Branch (SOME (q as ((sq,eq,cq),bq)),ls)) (n as ((sp,ep,cp),bp)) =
+    let val ls' = List.map (fn(branch)=> i branch n) ls
+	val diff as difference_in_amount_pieces_between_2_boards = (length bq) - (length bp)
+    in
+	case (eq=sp,diff) of
+	    (true,1) => Branch (SOME q,(Branch ((SOME n),[]))::ls')
+	  | (true,0) => Branch (SOME q, ls') (*Ignore duplicate*)
+	  | (false,_) => Branch (SOME q, ls') (*Ignore any later moves*)
+	  | (true,_) => Branch (SOME q, ls') 
+    end;
+
+
+print (magnify_board (draw_board [(3,3,~1,false),(2,2,1,false),(1,3,~1,false),(5,5,~1,false),(3,5,~1,false),(1,5,~1,false)]) 1);
+all_captures_by_p [(3,3,~1,false),(2,2,1,false),(1,3,~1,false),(5,5,~1,false),(3,5,~1,false),(1,5,~1,false)] (2,2,1,false);
