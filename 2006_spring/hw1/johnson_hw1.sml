@@ -203,8 +203,39 @@ fun all_captures_by_p [] _ = raise EmptyBoard
     in loop lpc lpu
     end;
 
-(*print (magnify_board (draw_board [(3,3,~1,false),(2,2,1,false),(1,3,~1,false),(5,5,~1,false),(3,5,~1,false),(1,5,~1,false)]) 1);*)
-all_captures_by_p [(3,3,~1,false),(2,2,1,false),(1,3,~1,false),(5,5,~1,false),(3,5,~1,false),(1,5,~1,false)] (2,2,1,false);
+(*Reconstruct the various results obtained from all_captures_by_p to its various ordered branches
+First the results obtained need to be grouped together under the common denominator of amount of pieces on board. Thus results are grouped together in groups of 1 piece only present, 2 pieces present, 3 pieces present etc. The less pieces will represent a further stage in the development of the game.
+The end result should thus be: [[c(1)],[c(2)],[c(3)],..,[c(n)]] where [c(n)] is the list of all possible board configurations that share the same amount of pieces.
+Second, starting from c(1) until c(n), the following must apply:
+from c(i) => c(i+1) should be such that some elements in c(i+1) have as ending point that corresponds to some elements in c(i). c(i+1) may also contain elements that will not correspond, which will thus represent that one particular branch has been exhausted in level c(i+1) and could never logically evolve into c(i).
+Both these are to be dealt with separately.
 
-print (magnify_board (draw_board [(0,4,1,false),(3,3,~1,false),(5,5,~1,false),(3,5,~1,false),(1,5,~1,false)]) 7);
-single_captures_by_p [(0,4,1,false),(3,3,~1,false),(5,5,~1,false),(3,5,~1,false),(1,5,~1,false)] (0,4,1,false);
+Third (still to be implemented): Actively pair up every instance from c(i) with the corresponding c(i+1). Those that do not branch further into c(i) should be included as is.
+
+*)
+fun sort_them c =
+  let val d_l as different_lengths = List.foldl (fn(((_,_,_),board),acc)=> let val l = length board   
+									   in if List.exists (fn(l')=>l'=l) acc then acc else l :: acc
+									   end)
+						[] c (* Output: [1,2,3,4,5] where each number corresponds to amount pieces on a board in differnt boards under c *)
+      val b_a_p as by_amount_pieces = List.map (fn(l)=> List.filter (fn((_,_,_),board)=> length board=l) c) d_l (*Sort c according to different board lengths above, eg [1,2,3,4,5]*)
+      val d_sp as different_starting_points = List.foldl (fn(((sp,_,_),_),acc)=> if List.exists (fn(sp')=>sp'=sp) acc then acc else sp :: acc)
+							 [] (*Output : ((sp,ep,cp),board) => [sp1,sp2,sp3,..] 
+							     Create a list of all the different starting points for a given list l*)
+      fun branch (ml::ml'::mls') acc =
+	let val b_csp as by_common_starting_points = List.foldl (fn(sp,acc)=>
+								    (List.foldl (fn(e,acc)=>[e]::acc)
+										[]
+										(List.filter (fn((sp',_,_),_)=> sp'=sp) ml)
+								    )@acc)
+								[]
+								(d_sp ml) (*Create a list of lists where every sub list occupies *)
+	    val b_csp2 = List.foldl (fn(e,acc)=> [e]::acc) [] ml
+	    val pair_ups as (pass,fail) = List.partition (fn((_,ep,_),_)=> List.exists (fn((sp,_,_),_)=> ep = sp) ml) ml'
+	in (b_a_p,b_csp2)
+	end
+  in (branch b_a_p [])
+  end;
+
+print (magnify_board (draw_board [(3,3,~1,false),(2,2,1,false),(1,3,~1,false),(5,5,~1,false),(3,5,~1,false),(1,5,~1,false)]) 1);
+all_captures_by_p [(3,3,~1,false),(2,2,1,false),(1,3,~1,false),(5,5,~1,false),(3,5,~1,false),(1,5,~1,false)] (2,2,1,false);
