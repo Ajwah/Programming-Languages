@@ -17,7 +17,8 @@ fun piece_at [] _ = NONE
 
 fun is_on_board [] _ = false
   | is_on_board _ NONE = false
-  | is_on_board (c::cs') (SOME p) = c = p orelse is_on_board cs' (SOME p)												  
+  | is_on_board (c::cs') (SOME p) = c = p orelse is_on_board cs' (SOME p)
+							     
 fun legal_config c =
     let fun isDuplicate [] _ = false
 	  | isDuplicate ((x,y,_,_)::ls') (p as (px,py,_,_)) = if px=x andalso py=y then true else isDuplicate ls' p
@@ -211,9 +212,10 @@ fun all_captures_by_p [] _ = raise EmptyBoard
     in loop lpc lpu
     end;
 
-datatype 'a tree = Branch of 'a option * 'a tree list;
+datatype 'a tree = Branch of 'a option * 'a tree list | MBranch of 'a tree list
 
-fun i (Branch (NONE,_)) n = Branch (SOME n,[])
+fun i_MB (MBranch lst) n = MBranch (((Branch (SOME n,[]))::lst))								      
+fun i (MBranch lst) n =  List.map (fn(branch)=> i branch n) lst
   | i (Branch (SOME (q as ((sq,eq,cq),bq)),ls)) (n as ((sp,ep,cp),bp)) =
     let val ls' = List.map (fn(branch)=> i branch n) ls
 	val diff as difference_in_amount_pieces_between_2_boards = (length bq) - (length bp)
@@ -232,7 +234,10 @@ fun manage_captures c =
 									   end)
 						[] c (* Output: [1,2,3,4,5] where each number corresponds to amount pieces on a board in differnt boards under c *)
       val b_a_p as by_amount_pieces as (ml::ml'::mls') = List.map (fn(l)=> List.filter (fn((_,_,_),board)=> length board=l) c) d_l (*Sort c according to different board lengths above, eg [1,2,3,4,5]*)
-      val tree = List.foldl (fn(e,acc)=> i acc e) (Branch (NONE,[])) (List.concat (rev b_a_p))
+      val scl as starting_configurations_lst = List.last b_a_p
+      val rcl as remainder_configurations_lst = List.concat (rev (List.take (b_a_p,length b_a_p -1)))
+      val mother = List.foldl (fn(e,acc)=> i_MB acc e) (MBranch []) scl
+      val tree = List.foldl (fn(e,acc)=> i acc e) (Branch (NONE,[])) rcl
   in tree
   end
 
