@@ -104,7 +104,7 @@ exception IllegalConfig and
 	  ImpossibleError2 and
 	  ImpossibleError3 
 	      
-fun legal_move_core c (p as (px,py,ps,pk))  (d as (dx,dy)) =
+fun legal_move_core c (p as (px,py,ps,pk)) (d as (dx,dy)) =
   let val moved as (mx,my) = (px+dx,py+dy)
       val atomicStep as (ax,ay) = (dx div abs(dx), dy div abs(dy)) handle Div => raise ZeroMove
       (*val printer = (print ("\n p: ("^(Int.toString(px))^","^(Int.toString(py))^") d: ("^(Int.toString(dx))^","^(Int.toString(dy))^")"))*)
@@ -192,7 +192,7 @@ fun single_captures_by_p [] p = raise EmptyBoard
     let val em as every_possible_move_on_board = all_single_moves c pr
 	val captures_by_p = List.filter (fn(sp,_,lc)=> case lc of
 							   NONE => false
-							 | SOME piece => p = sp
+							 | SOME piece => p = sp (*If piece has been captured, check if it has been captured by p*)
 					) em
     in captures_by_p
     end
@@ -205,12 +205,33 @@ fun all_captures_by_p [] _ = raise EmptyBoard
 	fun loop [] [] = []
 	  | loop ((pc as (sp,ep,lc))::lpc') (pu::lpu') =
 	    let val pri = List.foldl (fn(e,acc)=> acc ^"\n"^ (convert2str e)) "" pu
-		val _ = (print ("\n "^(convert2str sp)^" ==> "^(convert2str ep)^" Captured Piece: "^(convert2str (valOf lc))^"\n"^(magnify_board (draw_board pu) 2)^pri))
+		val _ = (("\n "^(convert2str sp)^" ==> "^(convert2str ep)^" Captured Piece: "^(convert2str (valOf lc))^"\n"^(magnify_board (draw_board pu) 2)^pri))
 	    in
 		((pc,pu) :: all_captures_by_p pu ep) @ loop lpc' lpu'
 	    end
     in loop lpc lpu
     end;
+
+exception EnforceCapture of string and Anomaly
+fun legal_move_enforce_capture c (p as (_,_,pr,_)) d = 
+  let val move as [(_,_,capture)] = legal_move_core c p d
+      val all_moves = all_single_moves c pr
+      val captures = List.filter (fn(sp,_,lc)=> case lc of
+						    NONE => false
+						  | SOME piece => true
+				 ) all_moves
+      val is_exist_capture = length captures > 0
+    (*  val is_capture_made_if_possible = if capture = NONE then List.exists (fn(sp,ep,cp)=> case cp of
+												NONE => false
+											      | SOME captured_piece => sp = p) captures = NONE else true *)
+      val error_msg = List.foldl (fn(s,acc)=> acc ^"\n"^toStr (s,[])) "" captures
+  in
+      if is_exist_capture andalso capture = NONE
+      then raise EnforceCapture error_msg
+      else if not is_exist_capture andalso capture <> NONE
+      then raise Anomaly
+      else move
+  end
 
 datatype 'a tree = Branch of 'a option * 'a tree list | MBranch of 'a tree list
 
