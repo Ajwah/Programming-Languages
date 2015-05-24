@@ -171,7 +171,7 @@ fun all_single_moves [] _ = []
 exception CaptureNotPresent and EmptyBoard
 				    
 fun update_board [] _ = raise EmptyBoard
-  | update_board c (sp as startingPiece, ep as endingPiece as (epx,epy,_,_), lc as listOfCaptures) =
+  | update_board c (sp as startingPiece, ep as endingPiece as (epx,epy,epr,epk), lc as listOfCaptures) =
     let val d as impossible_dummy_piece =  (~1,~1,100,false)
 	val cp as captured_piece = case lc of NONE => d
 					    | SOME p => p
@@ -184,7 +184,11 @@ fun update_board [] _ = raise EmptyBoard
 				    else true
 					     
 	val updated = List.filter (fn(e)=>e<>sp andalso e<>cp) c
-    in add_piece updated ep
+	val ep_checked_coronation = if epk then ep
+				    else if epr = 1 andalso epy = maxY-1 then (epx,epy,epr,true)
+				    else if epr = ~1 andalso epy = 0 then (epx,epy,epr,true)
+				    else ep
+    in add_piece updated ep_checked_coronation
     end
 
 fun single_captures_by_p [] p = raise EmptyBoard
@@ -221,10 +225,7 @@ fun legal_move_enforce_capture c (p as (_,_,pr,_)) d =
 						  | SOME piece => true
 				 ) all_moves
       val is_exist_capture = length captures > 0
-    (*  val is_capture_made_if_possible = if capture = NONE then List.exists (fn(sp,ep,cp)=> case cp of
-												NONE => false
-											      | SOME captured_piece => sp = p) captures = NONE else true *)
-      val error_msg = List.foldl (fn(s,acc)=> acc ^"\n"^toStr (s,[])) "" captures
+      val error_msg = List.foldl (fn(s,acc)=> acc ^"\n"^toStr (s,[])) "ERROR: CAPTURE NOT MADE. CONSIDER ANY OF FOLLOWING: " captures
   in
       if is_exist_capture andalso capture = NONE
       then raise EnforceCapture error_msg
@@ -293,5 +294,9 @@ val z = (manage_captures t);
 val e = retrieve_longest z;
 val w = print (streamToStr e);
 
-val a = legal_move_enforce_capture c (2,2,1,true) (~2,~2);
-val b = legal_move_core c (2,2,1,true) (~2,~2);
+val a = legal_move_core c (2,2,1,true) (~2,~2);
+val b = legal_move_enforce_capture c (2,2,1,true) (~2,~2) handle EnforceCapture msg => (print (msg);a);
+
+print (magnify_board (draw_board [(1,1,~1,false)]) 3);
+val p = hd (legal_move [(1,1,~1,false)] (1,1,~1,false) (~1,~1));
+print (magnify_board (draw_board (update_board [(1,1,~1,false)] p)) 3);
