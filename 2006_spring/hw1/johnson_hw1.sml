@@ -272,12 +272,13 @@ fun t2Str (Branch (NONE,_)) = "EMPTY BOARD"
   | t2Str (MBranch lst) = (List.foldl (fn(e,acc)=> acc^ t2Str e) "\n\n\n Mother Branch: " lst) 
 
 	
-fun manage_captures c =
+fun manage_captures [] = MBranch []
+  | manage_captures c  = 
   let val d_l as different_lengths = List.foldl (fn(((_,_,_),board),acc)=> let val l = length board   
 									   in if List.exists (fn(l')=>l'=l) acc then acc else l :: acc
 									   end)
 						[] c (* Output: [1,2,3,4,5] where each number corresponds to amount pieces on a board in differnt boards under c *)
-      val b_a_p as by_amount_pieces as (ml::ml'::mls') = List.map (fn(l)=> List.filter (fn((_,_,_),board)=> length board=l) c) d_l (*Sort c according to different board lengths above, eg [1,2,3,4,5]*)
+      val b_a_p as by_amount_pieces = List.map (fn(l)=> List.filter (fn((_,_,_),board)=> length board=l) c) d_l (*Sort c according to different board lengths above, eg [1,2,3,4,5]*)
       val scl as starting_configurations_lst = List.last b_a_p
       val rcl as remainder_configurations_lst = List.concat (rev (List.take (b_a_p,length b_a_p -1)))
       val mother = List.foldl (fn(e,acc)=> i_MB acc e) (MBranch []) scl
@@ -307,6 +308,16 @@ fun find_vanquished_party c =
   in if partyA andalso partyB then NONE else if partyA then SOME 1 else if partyB then SOME ~1 else SOME 0
   end
 
+fun process_move c (m as (sp,ep,NONE)) = [(m,update_board c m)]
+  | process_move c (m as (sp,ep,SOME cp)) =
+    let val all_captures_lst = all_captures_by_p c sp
+	val all_captures_tree = manage_captures all_captures_lst
+	val longest_branch = retrieve_longest all_captures_tree
+	val _ = print ("\n longest_branch: "^Int.toString (length longest_branch))
+	val _ = print ("\n latest board: "^(magnify_board (draw_board (#2 (List.last longest_branch))) 3)) handle Empty => print("\n latest board is []")
+    in (m,update_board c m)::longest_branch
+    end
+      
 val rn = Random.rand (1,1);
 exception PartyAbsent of int
 fun think_a_move [] r = raise EmptyBoard
@@ -329,8 +340,10 @@ fun play [] _ = raise EmptyBoard
     let val is_vanquished_party = find_vanquished_party c <> NONE
 	fun do_play c =
 	  let val move = think_a_move c r
-	      val ncb as new_configuration_board = update_board c move
-	      val _ = print ("\n"^toStr (move,[])^"\n"^(magnify_board (draw_board ncb) 3))
+	      val fsj as forced_subsequent_jumps = process_move c move
+	      val ncb as new_configuration_board = #2 (List.last fsj)
+	      val _ = print ("\n"^toStr (move,[])^"\n"^(magnify_board (draw_board ncb) 7))
+	      val _ = TextIO.inputLine TextIO.stdIn
 	  in play ncb (~r)
 	  end 
     in if is_vanquished_party then c else do_play c
