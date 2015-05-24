@@ -307,6 +307,7 @@ fun find_vanquished_party c =
   in if partyA andalso partyB then NONE else if partyA then SOME 1 else if partyB then SOME ~1 else SOME 0
   end
 
+val rn = Random.rand (1,1);
 exception PartyAbsent of int
 fun think_a_move [] r = raise EmptyBoard
   | think_a_move c r =
@@ -317,8 +318,7 @@ fun think_a_move [] r = raise EmptyBoard
 	val (captures,no_captures) = List.partition (fn(_,_,cap)=> cap <> NONE) ls_all
 	val moves = if length captures > 0 then captures else no_captures
 	val max = length moves
-	val rnd_range = Random.randRange (0,max-1);
-	val rn = Random.rand (1,1);
+	val rnd_range = Random.randRange (0,max-1)
 	val _ = print ("\n max: "^Int.toString max ^" rnd: "^Int.toString (rnd_range rn))
     in List.nth (moves,rnd_range rn)
     end
