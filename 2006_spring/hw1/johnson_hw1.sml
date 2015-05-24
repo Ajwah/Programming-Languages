@@ -282,7 +282,7 @@ fun manage_captures [] = MBranch []
       val scl as starting_configurations_lst = List.last b_a_p
       val rcl as remainder_configurations_lst = List.concat (rev (List.take (b_a_p,length b_a_p -1)))
       val mother = List.foldl (fn(e,acc)=> i_MB acc e) (MBranch []) scl
-      val _ = print (t2Str mother)
+  (*    val _ = print (t2Str mother) *)
       val tree = List.foldl (fn(e,acc)=> i acc e) (mother) rcl 
   in tree
   end
@@ -313,8 +313,9 @@ fun process_move c (m as (sp,ep,NONE)) = [(m,update_board c m)]
     let val all_captures_lst = all_captures_by_p c sp
 	val all_captures_tree = manage_captures all_captures_lst
 	val longest_branch = retrieve_longest all_captures_tree
-	val _ = print ("\n longest_branch: "^Int.toString (length longest_branch))
+(*	val _ = print ("\n longest_branch: "^Int.toString (length longest_branch))
 	val _ = print ("\n latest board: "^(magnify_board (draw_board (#2 (List.last longest_branch))) 3)) handle Empty => print("\n latest board is []")
+*)
     in (m,update_board c m)::longest_branch
     end
       
@@ -330,7 +331,7 @@ fun think_a_move [] r = raise EmptyBoard
 	val moves = if length captures > 0 then captures else no_captures
 	val max = length moves
 	val rnd_range = Random.randRange (0,max-1)
-	val _ = print ("\n max: "^Int.toString max ^" rnd: "^Int.toString (rnd_range rn))
+(*	val _ = print ("\n max: "^Int.toString max ^" rnd: "^Int.toString (rnd_range rn)) *)
     in List.nth (moves,rnd_range rn)
     end
 	
@@ -343,7 +344,7 @@ fun play [] _ = raise EmptyBoard
 	      val fsj as forced_subsequent_jumps = process_move c move
 	      val ncb as new_configuration_board = #2 (List.last fsj)
 	      val _ = print ("\n"^toStr (move,[])^"\n"^(magnify_board (draw_board ncb) 7))
-	      val _ = TextIO.inputLine TextIO.stdIn
+(*	      val _ = TextIO.inputLine TextIO.stdIn *)
 	  in play ncb (~r)
 	  end 
     in if is_vanquished_party then c else do_play c
