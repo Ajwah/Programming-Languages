@@ -249,10 +249,24 @@ fun manage_captures c =
   in tree
   end
 
+fun retrieve_longest (MBranch lst) =
+  let fun r (Branch (SOME p,[])) acc = p::acc
+	| r (Branch (SOME p,ls)) acc = let val ln = length acc
+					   val b = List.map (fn(br)=> r br acc) ls
+					   val d = List.foldl (fn(br,acc)=> if length br > length acc then br else acc) [] b
+					 in  p::d
+				       end
+      val edm as explore_different_mothers = List.map (fn(b) => r b []) lst
+      val answer as find_longest = List.foldl (fn(br,acc)=> if length br > length acc then br else acc) [] edm
+  in answer
+  end
 
+fun streamToStr [] = ""
+  | streamToStr ((p,b)::ss') = "\n"^toStr (p,b) ^ "\n"^magnify_board (draw_board b) 2 ^ streamToStr ss'
 ;
 
 print (magnify_board (draw_board [(3,3,~1,false),(2,2,1,false),(1,3,~1,false),(5,5,~1,false),(3,5,~1,false),(1,5,~1,false)]) 1);
-val t = all_captures_by_p [(3,3,~1,false),(2,2,1,true),(1,3,~1,false),(5,5,~1,false),(3,5,~1,false),(1,5,~1,false)] (2,2,1,true);
+val t = all_captures_by_p [(3,3,~1,false),(2,2,1,true),(5,5,~1,false),(3,5,~1,false),(1,3,~1,false),(1,5,~1,false)] (2,2,1,true);
 val z = (manage_captures t);
-val w = print (t2Str z);
+val e = retrieve_longest z;
+val w = print (streamToStr e);
