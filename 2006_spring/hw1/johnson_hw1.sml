@@ -27,6 +27,21 @@ fun legal_config c =
     in loop c
     end
 
+fun setup_board c =
+  let val ln = length c
+  in if ln = 0 then setup_board ((0,0,1,false)::(0,0+maxY-2,~1,false)::c)
+     else if ln < 2*maxX then
+	 let val p as (px,py,_,_) = hd c
+	     val py' = if px + 2 > maxX-1 andalso py = 0 then 1 else py
+	     val start = if py' = 0 then 0 else 1
+	     val px' = if px + 2 > maxX-1 then start else px + 2
+	     val qx' = px'
+	     val qy' = py' + maxY-2
+	 in  setup_board ((px',py',1,false)::(qx',qy',~1,false)::c)
+	 end
+     else c
+  end
+      
 fun draw_piece (p as (_,_,pr,pk))  =
   case (pr,pk) of
       (1,false) => "o"
@@ -336,3 +351,5 @@ val b = legal_move_enforce_capture c (2,2,1,true) (~2,~2) handle EnforceCapture 
 print (magnify_board (draw_board [(1,1,~1,false)]) 3);
 val p = hd (legal_move [(1,1,~1,false)] (1,1,~1,false) (~1,~1));
 print (magnify_board (draw_board (update_board [(1,1,~1,false)] p)) 3);
+val m = setup_board [];
+print (magnify_board (draw_board m) 7);
