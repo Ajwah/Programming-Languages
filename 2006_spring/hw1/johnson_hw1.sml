@@ -285,6 +285,42 @@ fun retrieve_longest (MBranch lst) =
 
 fun streamToStr [] = ""
   | streamToStr ((p,b)::ss') = "\n"^toStr (p,b) ^ "\n"^magnify_board (draw_board b) 2 ^ streamToStr ss'
+
+fun find_vanquished_party c =
+  let val partyA = List.exists (fn(_,_,pr,_)=>pr=1) c
+      val partyB = List.exists (fn(_,_,pr,_)=>pr= ~1) c
+  in if partyA andalso partyB then NONE else if partyA then SOME 1 else if partyB then SOME ~1 else SOME 0
+  end
+
+exception PartyAbsent of int
+fun think_a_move [] r = raise EmptyBoard
+  | think_a_move c r =
+    let 
+	val ls_all as lst_all_possible_moves_on_board_for_Party_r = all_single_moves c r
+	val assert_Presence_Party_r = if length ls_all = 0 then raise PartyAbsent r else true
+											     
+	val (captures,no_captures) = List.partition (fn(_,_,cap)=> cap <> NONE) ls_all
+	val moves = if length captures > 0 then captures else no_captures
+	val max = length moves
+	val rnd_range = Random.randRange (0,max-1);
+	val rn = Random.rand (1,1);
+	val _ = print ("\n max: "^Int.toString max ^" rnd: "^Int.toString (rnd_range rn))
+    in List.nth (moves,rnd_range rn)
+    end
+	
+fun play [] _ = raise EmptyBoard
+  | play (p::[]) _ = [p]
+  | play c r = 
+    let val is_vanquished_party = find_vanquished_party c <> NONE
+	fun do_play c =
+	  let val move = think_a_move c r
+	      val ncb as new_configuration_board = update_board c move
+	      val _ = print ("\n"^toStr (move,[])^"\n"^(magnify_board (draw_board ncb) 3))
+	  in play ncb (~r)
+	  end 
+    in if is_vanquished_party then c else do_play c
+    end
+ 
 ;
 
   val c = [(3,3,~1,false),(2,2,1,true),(5,5,~1,false),(3,5,~1,false),(1,3,~1,false),(1,5,~1,false)];
