@@ -1,3 +1,4 @@
+fun toStr l = List.foldl (fn((fv,v),acc)=> acc ^ "("^ fv ^","^ Bool.toString(v)^") ") "\n" l (*For debugging*)
 infix mem
 fun x mem [] = false
   | x mem (y::ys) = x=y orelse x mem ys
@@ -138,16 +139,52 @@ fun binary_possibilities 0 bt bf = []
 	val (amount_bin_possibilities, bin_enumerations) = List.foldl (fn(_,(i,acc))=> (i+1, (List.map (fn(l)=>List.nth(l,i)) enumerate)::acc)) (0,[]) (hd enumerate)
     in bin_enumerations
     end
-fun toStr l = List.foldl (fn((fv,v),acc)=> acc ^ "("^ fv ^","^ Bool.toString(v)^") ") "\n" l
 
-fun satisfying_assignments e =
+fun satisfying_assignments_long e =
   let val fv_ls = free_vars e
       val lst_bin_enums = binary_possibilities (length fv_ls) true false
       val lst = List.map (fn(l)=> ListPair.zip (fv_ls, l)) lst_bin_enums
       val result = List.filter (fn(l)=> eval (List.foldl (fn((fv,v),e)=> bindvar fv v e) e l)) lst
   in result
   end
-      
+
+(*Improved version of above within ten lines only!
+This shortened version works exactly in the opposite direction as the function binary_possibilities.
+In fun bin_pos... we first start from big and create smaller subparts with a particular pattern  which we then repeat to grow them to the required length.
+So 
+1 1 1 1 0 0 0 0 was our starting point
+Then 
+1 1 0 0 was the second step which is a pattern we repeat one more times to make it gorw to the size of the first one so it becomes:
+1 1 0 0 1 1 0 0
+Likewise for the final step: 1 0 => 1 0 1 0 1 0 1 0
+
+In this function I go exactly the opposite way, namely I start with the smalest instance and grow accordingly as is required.
+The fun will first find out all the free variables, say x y and z
+We traverse the list x,y,z one at a time, starting with x
+Since there is only one variable, 'x' that we are dealing with, we thus can only subscribe to it 2 possibilities: (x,true) and (x,false)
+We continue down the list and deal with the extra complexity of y as follows:
+In our existing list add (y,true) so we get: 
+[(x,true),(y,true)]
+[(x,false),(y,true)]
+Thereafter, on the same original list e.g. (x,true) and (x,false) we now have to repeat the procedure but then for (y,false), so we we get:
+[(x,true),(y,false)]
+[(x,false),(y,false)]
+
+Thereafter combine both together as our new list. Then proceed to the next element z and increase the complexity of our existing list analogous to what we did for y.
+
+After all the various possibilities have been enumerated, we now have our ultimate list, enumeration_lst. 
+Filter out from that list, all the combinations for which an eval after their corresponding bindings have been made will evaluate to true.
+*)
+fun satisfying_assignments e =
+  let val fv_ls = free_vars e
+      fun build_possibilities [] acc = acc
+	| build_possibilities (l::ls') acc =
+	  let fun grow b = List.map (fn(el)=> (l,b) :: el) acc
+	  in build_possibilities ls' (grow true @ grow false)
+	  end
+      val enl as enumerations_lst = build_possibilities fv_ls [[]]
+  in List.filter (fn(bl as binding_lst)=> eval (List.foldl (fn((fv,v),e)=> bindvar fv v e) e bl)) enl
+  end
 
 
 ;
@@ -159,6 +196,9 @@ val t5 = bind1 "x" true (And(Var "z",Or(Var "y", Var "z")));
 val t6 = bindvar "x" true (And(Var "x",Or(Var "y", Var "x")));
 val t7 = changevar "x" "help" (And(Var "x",Or(Var "y", Var "x")));
 
-val t8 = satisfying_assignments (Or(Var "x", Var "y"));
-val t9 = satisfying_assignments (Or(Var "x", And(Var "y", Var "z")));
-val t10 = satisfying_assignments (Or(Var "x", Or(Var "y", Or(Var "z", Or(Var "a", Or (Var "b", Or (Var "c", Var "d")))))));
+val t8 = satisfying_assignments_long (Or(Var "x", Var "y"));
+val t9 = satisfying_assignments_long (Or(Var "x", And(Var "y", Var "z")));
+val t10 = satisfying_assignments_long (Or(Var "x", Or(Var "y", Or(Var "z", Or(Var "a", Or (Var "b", Or (Var "c", Var "d")))))));
+val t11 = satisfying_assignments (Or(Var "x", Var "y"));
+val t12 = satisfying_assignments (Or(Var "x", And(Var "y", Var "z")));
+val t13 = satisfying_assignments (Or(Var "x", Or(Var "y", Or(Var "z", Or(Var "a", Or (Var "b", Or (Var "c", Var "d")))))));
