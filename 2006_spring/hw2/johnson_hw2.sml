@@ -74,6 +74,57 @@ fun bind binder (Const b) = Const b
 fun bindvar fv v e = bind (fn(a)=>if a=fv then Const v else Var a) e
 fun changevar fv v e = bind (fn(a)=>if a=fv then Var v else Var a) e
 
+(*Given a size of binary digits return all the possible binary combinations that such a size can occupy
+Example: Given a space of binary digits of size 2, to return all the possible combinations that such a size of binary digits may occupy translates to the following workout:
+Size 2 => _ _ for binary digits 1 & 0 should yield following 4 possibilities: 1 1 - 0 0 - 1 0 - 0 1
+The way of obtaining all these possibilities is by realizing that the above possibilities can be written as:
+1 1
+1 0
+0 1
+0 0
+This gives us two columns that can be easily constructed: Column 1 = 1 1 0 0 and Column 2 = 1 0 1 0
+In similar manner for size three we have following possibilities:
+
+1 1 0
+1 1 1
+1 0 0
+1 0 1
+0 1 0
+0 1 1
+0 0 0
+0 0 1
+
+First column: 1 1 1 1 0 0 0 0
+Second colum: 1 1 0 0 1 1 0 0
+Third column: 1 0 1 0 1 0 1 0
+
+The fun below constructs every column individually.
+Once these three columns are obtained, they are then combined together, nth element of every list with the nth element of the other list in order so that the above example will result in:
+[
+ [1,1,1],
+ [1,1,0],
+ [1,0,1],
+  ....
+ [0,0,0]
+] 
+
+In our example, since we are dealing with size 3, we thus should in total have 2^3 amount of possibilities.
+Originaly, my fun will produce like this:
+1 1 1 1 0 0 0 0
+1 1 0 0
+1 0 
+
+From this, we essentialy need:
+1 1 1 1 
+1 1
+1
+For the rest it suffices to mirror the zero to fill up accordingly.
+Thereafter, we need to repeat our pattern  so that all the lists are of equal length:
+1 1 1 1 0 0 0 0 is of length 8 and thus does not need to be extended
+1 1 0 0         is only half the length so we need to extend it by doubling it so we get:        1 1 0 0 1 1 0 0
+1 0             is only a fourth of the length so we need to add three more of itself so we get: 1 0 1 0 1 0 1 0
+
+*)			    
 fun binary_possibilities 0 bt bf = []
   | binary_possibilities n bt bf = 
     let val n = round(Math.pow(2.0,real(n)-1.0)) (*shadow n with the starting value*)
@@ -88,6 +139,7 @@ fun binary_possibilities 0 bt bf = []
     in bin_enumerations
     end
 fun toStr l = List.foldl (fn((fv,v),acc)=> acc ^ "("^ fv ^","^ Bool.toString(v)^") ") "\n" l
+
 fun satisfying_assignments e =
   let val fv_ls = free_vars e
       val lst_bin_enums = binary_possibilities (length fv_ls) true false
@@ -96,11 +148,7 @@ fun satisfying_assignments e =
   in result
   end
       
-val f1 = binary_possibilities;
-val f2 = satisfying_assignments;
-val m = satisfying_assignments (Or(Var "x", Var "y"));
-val n = satisfying_assignments (Or(Var "x", And(Var "y", Var "z")));
-val p = satisfying_assignments (Or(Var "x", Or(Var "y", Or(Var "z", Or(Var "a", Or (Var "b", Or (Var "c", Var "d")))))));
+
 
 ;
 val t1 = free_vars (And(Not(Var "x"),Or(Const true, Var "x")));
@@ -110,3 +158,7 @@ val t4 = bind1 "x" true (And(Var "x",Or(Var "y", Var "x")));
 val t5 = bind1 "x" true (And(Var "z",Or(Var "y", Var "z")));
 val t6 = bindvar "x" true (And(Var "x",Or(Var "y", Var "x")));
 val t7 = changevar "x" "help" (And(Var "x",Or(Var "y", Var "x")));
+
+val t8 = satisfying_assignments (Or(Var "x", Var "y"));
+val t9 = satisfying_assignments (Or(Var "x", And(Var "y", Var "z")));
+val t10 = satisfying_assignments (Or(Var "x", Or(Var "y", Or(Var "z", Or(Var "a", Or (Var "b", Or (Var "c", Var "d")))))));
