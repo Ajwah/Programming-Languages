@@ -70,10 +70,38 @@ fun bind binder (Const b) = Const b
   | bind binder (Not e) = Not (bind binder e)
   | bind binder (And (e1,e2)) = And (bind binder e1, bind binder e2)
   | bind binder (Or (e1,e2)) = Or (bind binder e1, bind binder e2)
-
+				  
 fun bindvar fv v e = bind (fn(a)=>if a=fv then Const v else Var a) e
-
 fun changevar fv v e = bind (fn(a)=>if a=fv then Var v else Var a) e
+
+fun binary_possibilities 0 bt bf = []
+  | binary_possibilities n bt bf = 
+    let val n = round(Math.pow(2.0,real(n)-1.0)) (*shadow n with the starting value*)
+	fun build a 0 = []
+	  | build a n = a :: build a (n-1)  (*Build a list of consecutive smth, e.g [1,1,1,1,1,..] or [true,true,true,...] etc.*)
+	fun connect m 0 = []
+	  | connect m i = build bt m @ build bf m @ connect m (i - 1) (*bring opposites together to form one list e.g. [1,1] and [0,0] should become [1,1,0,0]. Thereafter, repeat this pattern*)
+	fun loop 0 = []
+	  | loop i = [connect i (n div i)] @ loop (i div 2) 
+	val enumerate = loop n
+	val (amount_bin_possibilities, bin_enumerations) = List.foldl (fn(_,(i,acc))=> (i+1, (List.map (fn(l)=>List.nth(l,i)) enumerate)::acc)) (0,[]) (hd enumerate)
+    in bin_enumerations
+    end
+fun toStr l = List.foldl (fn((fv,v),acc)=> acc ^ "("^ fv ^","^ Bool.toString(v)^") ") "\n" l
+fun satisfying_assignments e =
+  let val fv_ls = free_vars e
+      val lst_bin_enums = binary_possibilities (length fv_ls) true false
+      val lst = List.map (fn(l)=> ListPair.zip (fv_ls, l)) lst_bin_enums
+      val result = List.filter (fn(l)=> eval (List.foldl (fn((fv,v),e)=> bindvar fv v e) e l)) lst
+  in result
+  end
+      
+val f1 = binary_possibilities;
+val f2 = satisfying_assignments;
+val m = satisfying_assignments (Or(Var "x", Var "y"));
+val n = satisfying_assignments (Or(Var "x", And(Var "y", Var "z")));
+val p = satisfying_assignments (Or(Var "x", Or(Var "y", Or(Var "z", Or(Var "a", Or (Var "b", Or (Var "c", Var "d")))))));
+
 ;
 val t1 = free_vars (And(Not(Var "x"),Or(Const true, Var "x")));
 val t2 = eval (Or(Const true,Var "x")) = false handle UnboundVar=> true;
