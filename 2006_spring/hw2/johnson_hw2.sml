@@ -46,6 +46,8 @@ datatype 'a expr =
        | Not of 'a expr
        | And of 'a expr * 'a expr
        | Or of 'a expr * 'a expr
+       | Exist of 'a * 'a expr
+       | All of 'a * 'a expr
 exception UnboundVar
 
 fun free_vars (Const b) = []
@@ -53,12 +55,16 @@ fun free_vars (Const b) = []
   | free_vars (Not e) = free_vars e
   | free_vars (And (e1,e2)) = free_vars e1 union free_vars e2
   | free_vars (Or (e1,e2)) = free_vars e1 union free_vars e2
+  | free_vars (Exist (a, e)) = free_vars e
+  | free_vars (All (a, e)) = free_vars e
 
 fun eval (Const b) = b
   | eval (Var a) = raise UnboundVar
   | eval (Not e) = not (eval e)
   | eval (And (e1,e2)) = (fn(t1,t2) => t1 andalso t2)(eval e1, eval e2) (*This way enforces that both e1 and e2 have no free variables*)
   | eval (Or (e1,e2)) = (fn(t1,t2) => t1 orelse t2)(eval e1, eval e2)
+  | eval (Exist (a, e)) = eval e
+  | eval (All (a, e)) = eval e
 
 fun bind1 fv v (Const b) = Const b
   | bind1 fv v (Var a) = if a=fv then Const v else Var a
@@ -71,6 +77,8 @@ fun bind binder (Const b) = Const b
   | bind binder (Not e) = Not (bind binder e)
   | bind binder (And (e1,e2)) = And (bind binder e1, bind binder e2)
   | bind binder (Or (e1,e2)) = Or (bind binder e1, bind binder e2)
+  | bind binder (Exist (a,e)) = bind binder e
+  | bind binder (All (a,e)) = bind binder e
 				  
 fun bindvar fv v e = bind (fn(a)=>if a=fv then Const v else Var a) e
 fun changevar fv v e = bind (fn(a)=>if a=fv then Var v else Var a) e
@@ -186,6 +194,39 @@ fun satisfying_assignments e =
   in List.filter (fn(bl as binding_lst)=> eval (List.foldl (fn((fv,v),e)=> bindvar fv v e) e bl)) enl
   end
 
+(*Function below is implementation of challenge exercise whereby the above fun was to be extended to incorporate existantial quantifiers Exist and All
+for instance: Exist("x",And(Not(Var "x"),Or(Const true, Var "x"))) will evaluate to true as there exists at least one x, whether true or false such that the expression evaluates to true.
+On the other hand: All("y",Exist("x",And(Not(Var "x"),Or(Var "y", Var "x")))) will evaluate to false as the evaluation of the expression cannot render true for every instance of y, which means that both the cases where y is true and false should allow for evaluation of the expression to true.
+
+To implement this, first and foremost the function needs to collect all the different variables coming under these quantifiers that can be nested in any part of the expression, beginning middle and end. Since their position cannot have any effect on the final result, it therefore suffices to collect them and divide them into two groups, e.g. those belonging to Exist and those belonging to All.
+The next matter that needs to be checked is if the quantifiers contain only such free variables that are actually used in the expression. If not, then the exception BadFormulation will be raised.
+
+To validate the expressions, for the free variables under All we will need to find instances where both true and false are actual occurences coming in the evaluation of satisfying_arguments.
+This is done by checking if the list of both is greater than 0. Lastly, the subset obtained from filtering satisfying_arguments to render only the results that fulfill the criteria of All, this subset is now to be checked again for a valid occurence of Exist free variables which requires the mere existence of a true or a false therein.
+*)
+exception BadFormulation of string
+fun satisfying_assignments_extended e =
+  let val ls_sa as lst_of_satisfying_assignments = satisfying_assignments e
+      fun retrieve_E_A (Const _) = []
+	| retrieve_E_A (Var _) = []
+	| retrieve_E_A (Not e) = retrieve_E_A e
+	| retrieve_E_A (And(e1,e2)) = retrieve_E_A e1 @ retrieve_E_A e2
+	| retrieve_E_A (Or(e1,e2)) = retrieve_E_A e1 @ retrieve_E_A e2												     
+	| retrieve_E_A (Exist(v, exp)) = [("E", v)] @ retrieve_E_A exp
+	| retrieve_E_A (All(v, exp)) = [("A", v)] @ retrieve_E_A exp
+      val fv_ls = free_vars e
+      val ql as quantifier_lst = retrieve_E_A e
+      val vs_ql as vs_from_ql = List.map (fn(q,v)=>v) ql
+      val assert_SaneFormulation = if length vs_ql = length (vs_ql isect fv_ls) then true else raise BadFormulation "Employment of redundant quantifier variables (some of or all) "
+      fun denude (xs,ys) = ( List.map (fn(q,v)=>v) xs, List.map (fn(q,v)=>v) ys)
+      val (avs as vs_belonging_to_All, evs as vs_belonging_to_Exist) = denude (List.partition (fn(q,v)=>q="A") ql)
+      val f_avs_true = List.filter (fn(l)=> List.foldl (fn(fv',acc)=>acc andalso List.exists (fn(fv,v)=>if fv=fv' then v=true else false) l) true avs) ls_sa
+      val f_avs_false = List.filter (fn(l)=> List.foldl (fn(fv',acc)=>acc andalso List.exists (fn(fv,v)=>if fv=fv' then v=false else false) l) true avs) ls_sa
+      val f_evs = List.filter (fn(l)=> List.foldl (fn(fv',acc)=>acc andalso List.exists (fn(fv,v)=>fv=fv') l) true avs) (f_avs_true @ f_avs_false)
+      in  length f_avs_true > 0 andalso length f_avs_false > 0 andalso length f_evs > 0
+  end
+
+
 
 ;
 val t1 = free_vars (And(Not(Var "x"),Or(Const true, Var "x")));
@@ -202,3 +243,5 @@ val t10 = satisfying_assignments_long (Or(Var "x", Or(Var "y", Or(Var "z", Or(Va
 val t11 = satisfying_assignments (Or(Var "x", Var "y"));
 val t12 = satisfying_assignments (Or(Var "x", And(Var "y", Var "z")));
 val t13 = satisfying_assignments (Or(Var "x", Or(Var "y", Or(Var "z", Or(Var "a", Or (Var "b", Or (Var "c", Var "d")))))));
+val t14 = satisfying_assignments_extended (Exist("x",And(Not(Var "x"),Or(Const true, Var "x")))) = true;
+val t15 = satisfying_assignments_extended (All("y",Exist("x",And(Not(Var "x"),Or(Var "y", Var "x"))))) = false;
