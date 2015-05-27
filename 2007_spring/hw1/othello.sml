@@ -41,8 +41,11 @@ fun flanks p s d = length (retrieve_converts p s d)
 fun move (p as (px,py)) (s as (t,brd)) =
   let val assert_sound_state = if is_sound_state s then true else raise UnsoundState
       val assert_sound_position = if legalpos p then true else raise UnsoundPosition
-      val new_board = true
-  in new_board
+      val all_converts = List.concat (List.map (fn(d)=> retrieve_converts p s d) sound_directions)
+      val (pass,fail) = List.partition (fn(co,_)=> List.exists (fn(co')=> co=co') all_converts) brd
+      val change_them = List.map (fn(co,col)=> (co,t)) pass
+      val new_board = (p,t) :: change_them @ fail
+  in (~t,new_board)
   end
   
 			       
@@ -225,3 +228,12 @@ case all_tests(tests) of
     true => print "--------------EVERY TESTS PASSED-------------\n"
   | false => print "--------------SOMETHING IS WRONG-------------------------\n";
 
+val next1 = move (3,5) init;   show next1;
+val next2 = move (3,6) next1;  show next2;
+val next3 = move (5,3) next2;  show next3;
+val next4 = move (4,3) next3;  show next4;
+val next5 = move (3,3) next4;  show next5;
+val next6 = move (4,2) next5;  show next6;
+val next7 = move (2,7) next6;  show next7;
+val next8 = move (6,4) next7;  show next8;
+val next9 = move (6,3) next8;  show next9;
