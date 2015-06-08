@@ -103,3 +103,4 @@ val t12 = fix1 "x" true (And(Var "z", Or(Var "y", Var "z")));
 val t13 = fixvar "x" true (And(Var "x",Or(All("x",And(Var "x",Var "y")), Var "x")));
 val t14 = changevar "x" "help" (And(Var "x",Or(All("x",And(Var "x",Var "y")), Var "x")));
 val t15 = swapvar "x" "y" (And(Var "x",Or(Var "x",Var "y")));
+val t16 = swapvar "x" "y" (And(Var "y",Or(All("x",And(Var "x",Var "y")), Var "y"))); (*Results in only one free variable*)
