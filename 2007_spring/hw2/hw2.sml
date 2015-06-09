@@ -43,7 +43,7 @@ val y = Var "y";
 val z = Var "z";
 
 fun free_vars e =
-  let fun helper (Const _) = [""]
+  let fun helper (Const _) = []
 	| helper (Var v) = [v]
 	| helper (Not e) = helper e
 	| helper (And (e1,e2)) = helper e1 @ helper e2 
@@ -63,8 +63,8 @@ fun eval e env = case e of
 		   | Not e => not (eval e env)
 		   | And (e1,e2) => (fn(t1,t2)=>t1 andalso t2)(eval e1 env,eval e2 env) 
 		   | Or (e1,e2) => (fn(t1,t2)=>t1 orelse t2)(eval e1 env,eval e2 env)
-		   | All (_,e) => eval e env
-		   | Exist (_,e) => eval e env
+		   | All (x,e) => eval e ((x,true)::env) andalso eval e ((x,false)::env)
+		   | Exist (x,e) => eval e ((x,true)::env) orelse eval e ((x,false)::env)
 					 
 fun fix1 x b e = case e of
 		     Const b => Const b
@@ -91,7 +91,17 @@ fun fix f e =
 fun fixvar s b e = fix (fn(Var x)=> if x=s then Const b else Var x) e
 fun changevar s v e = fix (fn(Var x)=> if x=s then Var v else Var x) e
 fun swapvar x y e = fix (fn(Var l)=> if l=x then Var y else if l=y then Var x else Var l) e
-			
+
+fun satisfying_assignments e =
+  let fun helper [] env e =
+	let val fvs = free_vars e
+	    val en = if fvs = [] then env else List.filter (fn(x,_)=> List.exists (fn(y)=>x<>y) fvs) env
+	in if eval e [] then [en] else []
+	end
+	| helper (fv::fvs) env e = helper fvs ((fv,true)::env) (fixvar fv true e) @ helper fvs ((fv,false)::env) (fixvar fv false e)
+  in setof (helper (free_vars e) [] e)
+  end
+	
 val t5 = free_vars (And(x,All("x",Or(x,Exist("y",Or(x,Or(y,Exist("x",Or(Not(x),z)))))))));
 val t6 = getenv "z" [("x",true),("z",false),("z",true)] = false;
 val t7 = eval (Or(Const true,Var "x")) [("x",true),("z",false),("z",true)] = true;
@@ -104,3 +114,7 @@ val t13 = fixvar "x" true (And(Var "x",Or(All("x",And(Var "x",Var "y")), Var "x"
 val t14 = changevar "x" "help" (And(Var "x",Or(All("x",And(Var "x",Var "y")), Var "x")));
 val t15 = swapvar "x" "y" (And(Var "x",Or(Var "x",Var "y")));
 val t16 = swapvar "x" "y" (And(Var "y",Or(All("x",And(Var "x",Var "y")), Var "y"))); (*Results in only one free variable*)
+val t17 = satisfying_assignments (And(Not(Var "x"),Or(Const true, Var "x")));
+val t18 = satisfying_assignments (And(Not(Var "x"),Or(Const false, Var "x")));
+val t19 = satisfying_assignments (Or(Var "x", Var "y"));
+val t20 = satisfying_assignments (And(Not(Var "x"),Exist("y",Or(Var "y",Var "x"))));
